@@ -18,6 +18,15 @@ A festival-goer starts far from the stage and works their way to the barrier. Th
 - **Handoffs:** each success ends with a short camera move that crossfades into the next step's opening view. The music never stops and only gets closer.
 - **Reset:** the round button (top right) returns to the silent far view from any step.
 
+### Appearance panel
+
+A floating, collapsible panel on the left lets you restyle every element of each step: fill color, texture, opacity, stroke width, corner radius, and shadow, plus an SVG asset for each hint hand icon (built-in icons or your own uploaded `.svg`). A yellow dot marks components changed from the saved defaults.
+
+- **Restore defaults** returns everything to the saved values in `js/appearance-defaults.js`.
+- **Copy settings** copies every component's name and current values, with an instruction to save them as the new defaults.
+- Your current tweaks are remembered in this browser until you restore the defaults.
+- A step's elements are only visible while that step is on screen, so play through to a step to see its changes.
+
 ### Run it
 
 It is a static site with no build step. Open `index.html` in a browser, or serve the repository root:
@@ -40,6 +49,9 @@ js/stage1-camera.js     step 1, from 01-camera-push-forward
 js/stage2-sides.js      step 2, from 02-push-to-the-side
 js/stage3-forward.js    step 3, from 03-push-forward-through-crowd
 js/main.js              sequence controller: gating, handoffs, reset
+js/panel.js             the appearance control panel
+js/appearance-defaults.js  saved defaults for the panel
+css/panel.css           panel styles
 .nojekyll               tells GitHub Pages to serve the files as is
 ```
 

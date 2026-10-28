@@ -22,11 +22,12 @@ Seq.stage2 = (() => {
   // Each person: head (cx, cy, r), body below it, optional raised arms, a row weight w,
   // and F = how far the full shove carries them (viewBox units).
   const people = [];
-  function person({ x, y, r, bw, bh, color, arms = [], sw = 4, s = 1, w, F }) {
+  function person({ c, x, y, r, bw, bh, color, arms = [], sw = 4, s = 1, w, F }) {
     const outer = document.createElementNS(NS, 'g');
     const inner = document.createElementNS(NS, 'g');
     inner.setAttribute('transform', `translate(${x} ${y}) scale(${s})`);
     inner.setAttribute('fill', color);
+    inner.dataset.c = c;               // the appearance panel's component name
     const head = document.createElementNS(NS, 'circle');
     head.setAttribute('cx', 0); head.setAttribute('cy', 0); head.setAttribute('r', r);
     const body = document.createElementNS(NS, 'rect');
@@ -38,6 +39,7 @@ Seq.stage2 = (() => {
       l.setAttribute('x1', x1 - x); l.setAttribute('y1', y1 - y);
       l.setAttribute('x2', x2 - x); l.setAttribute('y2', y2 - y);
       l.setAttribute('stroke', color); l.setAttribute('stroke-width', sw); l.setAttribute('stroke-linecap', 'round');
+      l.dataset.c = c;
       inner.appendChild(l);
     }
     outer.appendChild(inner); crowdG.appendChild(outer);
@@ -48,22 +50,22 @@ Seq.stage2 = (() => {
   // far row
   const farArms = { 130: [[135,282,142,252]], 330: [[335,282,342,252]], 430: [[425,282,418,252]], 580: [[585,282,592,252]], 730: [[735,282,742,252]] };
   [[30,268],[80,266],[130,269],[180,267],[230,268],[280,266],[330,269],[380,267],[430,268],[480,266],[530,269],[580,267],[630,268],[680,266],[730,269],[780,267]]
-    .forEach(([x, y]) => person({ x, y, r: 8, bw: 20, bh: 30, color: '#9a9a9a', arms: farArms[x], sw: 4, w: 0.15, F: 26 }));
+    .forEach(([x, y]) => person({ c: 's2-crowd-far', x, y, r: 8, bw: 20, bh: 30, color: '#9a9a9a', arms: farArms[x], sw: 4, w: 0.15, F: 26 }));
   // middle row
   const midArms = { 140: [[150,308,162,262],[130,308,118,262]], 490: [[500,308,512,262]], 660: [[670,308,682,262],[650,308,638,262]] };
   [[55,290],[140,288],[225,291],[310,289],[490,289],[575,291],[660,288],[745,290]]
-    .forEach(([x, y]) => person({ x, y, r: 12, bw: 30, bh: 50, color: '#666666', arms: midArms[x], sw: 7, w: 0.55, F: 240 }));
+    .forEach(([x, y]) => person({ c: 's2-crowd-mid', x, y, r: 12, bw: 30, bh: 50, color: '#666666', arms: midArms[x], sw: 7, w: 0.55, F: 240 }));
   // near row
-  person({ x: 20, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
-  person({ x: 175, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[195,366,222,290]], sw: 12, w: 0.75, F: 280 });
-  person({ x: 625, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[605,366,578,290]], sw: 12, w: 0.75, F: 280 });
-  person({ x: 780, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
+  person({ c: 's2-crowd-near', x: 20, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
+  person({ c: 's2-crowd-near', x: 175, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[195,366,222,290]], sw: 12, w: 0.75, F: 280 });
+  person({ c: 's2-crowd-near', x: 625, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[605,366,578,290]], sw: 12, w: 0.75, F: 280 });
+  person({ c: 's2-crowd-near', x: 780, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
   // the people right in front of the viewer: near-row figures, closer, blocking the stage
   const near = { r: 22, bw: 56, bh: 160 };
-  person({ ...near, x: 368, y: 222, s: 1.6, color: '#4c4c4c', w: 0.9, F: 470 });
-  person({ ...near, x: 438, y: 220, s: 1.6, color: '#4c4c4c', arms: [[458,260,485,184]], sw: 12, w: 0.9, F: 470 });
-  person({ ...near, x: 316, y: 206, s: 2.3, color: '#333333', w: 1, F: 470 });
-  person({ ...near, x: 494, y: 204, s: 2.3, color: '#333333', w: 1, F: 470 });
+  person({ ...near, c: 's2-blockers-back', x: 368, y: 222, s: 1.6, color: '#4c4c4c', w: 0.9, F: 470 });
+  person({ ...near, c: 's2-blockers-back', x: 438, y: 220, s: 1.6, color: '#4c4c4c', arms: [[458,260,485,184]], sw: 12, w: 0.9, F: 470 });
+  person({ ...near, c: 's2-blockers-front', x: 316, y: 206, s: 2.3, color: '#333333', w: 1, F: 470 });
+  person({ ...near, c: 's2-blockers-front', x: 494, y: 204, s: 2.3, color: '#333333', w: 1, F: 470 });
 
   // ---------- State ----------
   const SWIPE = 260;           // viewBox units of sideways drag needed to fill one bar

@@ -95,7 +95,7 @@
   // also starts the (still silent) music engine, as browsers require.
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('pointerdown', e => {
-    if (e.target.closest('.reset')) return;
+    if (e.target.closest('.reset, .panel')) return;
     music.start();
     if (stage === 1 && !busy) S1.down(e);
   });

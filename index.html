@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/panel.css">
 </head>
 <body>
 
@@ -26,32 +27,32 @@
     <!-- sky, sun, clouds -->
     <svg class="layer" data-r="200" data-e="330" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
       <defs><linearGradient id="s1-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d9d9"/><stop offset="1" stop-color="#f2f2f2"/></linearGradient></defs>
-      <rect x="-2000" y="-2000" width="4800" height="2400" fill="url(#s1-sky)"/>
-      <circle cx="660" cy="80" r="38" fill="#ffffff" stroke="#c4c4c4" stroke-width="2"/>
-      <g fill="#ffffff" opacity="0.9">
+      <rect data-c="s1-sky" x="-2000" y="-2000" width="4800" height="2400" fill="url(#s1-sky)"/>
+      <circle data-c="s1-sun" cx="660" cy="80" r="38" fill="#ffffff" stroke="#c4c4c4" stroke-width="2"/>
+      <g data-c="s1-clouds" fill="#ffffff" opacity="0.9">
         <ellipse cx="300" cy="70" rx="50" ry="16"/><ellipse cx="330" cy="60" rx="32" ry="16"/>
         <ellipse cx="500" cy="110" rx="40" ry="12"/><ellipse cx="520" cy="102" rx="24" ry="12"/>
       </g>
     </svg>
     <!-- distant hills -->
     <svg class="layer" data-r="15" data-e="318" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <path d="M-3000,320 L0,320 Q120,250 260,300 T520,290 T800,280 L3800,280 L3800,2000 L-3000,2000 Z" fill="#b5b5b5"/>
-      <path d="M-3000,350 L0,350 Q150,300 320,340 T640,330 T800,335 L3800,335 L3800,2000 L-3000,2000 Z" fill="#a0a0a0"/>
+      <path data-c="s1-hills-far" d="M-3000,320 L0,320 Q120,250 260,300 T520,290 T800,280 L3800,280 L3800,2000 L-3000,2000 Z" fill="#b5b5b5"/>
+      <path data-c="s1-hills-near" d="M-3000,350 L0,350 Q150,300 320,340 T640,330 T800,335 L3800,335 L3800,2000 L-3000,2000 Z" fill="#a0a0a0"/>
     </svg>
     <!-- ground plane -->
     <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <rect x="-20000" y="378" width="40000" height="20000" fill="#7a7a7a"/>
+      <rect data-c="s1-ground" x="-20000" y="378" width="40000" height="20000" fill="#7a7a7a"/>
     </svg>
     <!-- ferris wheel -->
     <svg class="layer" data-r="2.4" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <g stroke="#555555" stroke-width="3" fill="none">
+      <g data-c="s1-wheel-frame" stroke="#555555" stroke-width="3" fill="none">
         <line x1="140" y1="200" x2="95" y2="380"/><line x1="140" y1="200" x2="185" y2="380"/>
-        <circle cx="140" cy="200" r="90"/><circle cx="140" cy="200" r="70" stroke-width="1.5"/>
-        <line x1="50" y1="200" x2="230" y2="200" stroke-width="1.5"/><line x1="140" y1="110" x2="140" y2="290" stroke-width="1.5"/>
-        <line x1="76.4" y1="136.4" x2="203.6" y2="263.6" stroke-width="1.5"/><line x1="203.6" y1="136.4" x2="76.4" y2="263.6" stroke-width="1.5"/>
+        <circle cx="140" cy="200" r="90"/><circle data-c="s1-wheel-spokes" cx="140" cy="200" r="70" stroke-width="1.5"/>
+        <line data-c="s1-wheel-spokes" x1="50" y1="200" x2="230" y2="200" stroke-width="1.5"/><line data-c="s1-wheel-spokes" x1="140" y1="110" x2="140" y2="290" stroke-width="1.5"/>
+        <line data-c="s1-wheel-spokes" x1="76.4" y1="136.4" x2="203.6" y2="263.6" stroke-width="1.5"/><line data-c="s1-wheel-spokes" x1="203.6" y1="136.4" x2="76.4" y2="263.6" stroke-width="1.5"/>
       </g>
-      <circle cx="140" cy="200" r="7" fill="#444444"/>
-      <g fill="#6a6a6a">
+      <circle data-c="s1-wheel-hub" cx="140" cy="200" r="7" fill="#444444"/>
+      <g data-c="s1-wheel-cabins" fill="#6a6a6a">
         <rect x="222" y="202" width="16" height="12" rx="3"/><rect x="195.6" y="265.6" width="16" height="12" rx="3"/>
         <rect x="132" y="292" width="16" height="12" rx="3"/><rect x="68.4" y="265.6" width="16" height="12" rx="3"/>
         <rect x="42" y="202" width="16" height="12" rx="3"/><rect x="68.4" y="138.4" width="16" height="12" rx="3"/>
@@ -60,40 +61,40 @@
     </svg>
     <!-- stage: the destination -->
     <svg class="layer" data-r="2.2" data-e="292" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <rect x="330" y="200" width="220" height="100" fill="#8a8a8a"/>
-      <polygon points="310,200 570,200 550,172 330,172" fill="#3a3a3a"/>
-      <line x1="340" y1="186" x2="540" y2="186" stroke="#7a7a7a" stroke-width="1.5"/>
-      <rect x="320" y="175" width="10" height="125" fill="#3a3a3a"/><rect x="550" y="175" width="10" height="125" fill="#3a3a3a"/>
-      <rect x="315" y="300" width="250" height="40" fill="#4a4a4a"/>
-      <rect x="288" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="302" cy="265" r="7" fill="#555555"/><circle cx="302" cy="287" r="9" fill="#555555"/>
-      <rect x="564" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="578" cy="265" r="7" fill="#555555"/><circle cx="578" cy="287" r="9" fill="#555555"/>
-      <circle cx="440" cy="252" r="9" fill="#2b2b2b"/>
-      <rect x="433" y="261" width="14" height="39" rx="5" fill="#2b2b2b"/>
-      <line x1="447" y1="268" x2="462" y2="250" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
-      <line x1="420" y1="300" x2="420" y2="258" stroke="#2b2b2b" stroke-width="2"/><circle cx="420" cy="256" r="3" fill="#2b2b2b"/>
+      <rect data-c="s1-stage-back" x="330" y="200" width="220" height="100" fill="#8a8a8a"/>
+      <polygon data-c="s1-stage-roof" points="310,200 570,200 550,172 330,172" fill="#3a3a3a"/>
+      <line data-c="s1-stage-truss" x1="340" y1="186" x2="540" y2="186" stroke="#7a7a7a" stroke-width="1.5"/>
+      <rect data-c="s1-stage-roof" x="320" y="175" width="10" height="125" fill="#3a3a3a"/><rect data-c="s1-stage-roof" x="550" y="175" width="10" height="125" fill="#3a3a3a"/>
+      <rect data-c="s1-stage-deck" x="315" y="300" width="250" height="40" fill="#4a4a4a"/>
+      <rect data-c="s1-speakers" x="288" y="250" width="28" height="50" fill="#2e2e2e"/><circle data-c="s1-cones" cx="302" cy="265" r="7" fill="#555555"/><circle data-c="s1-cones" cx="302" cy="287" r="9" fill="#555555"/>
+      <rect data-c="s1-speakers" x="564" y="250" width="28" height="50" fill="#2e2e2e"/><circle data-c="s1-cones" cx="578" cy="265" r="7" fill="#555555"/><circle data-c="s1-cones" cx="578" cy="287" r="9" fill="#555555"/>
+      <circle data-c="s1-performer" cx="440" cy="252" r="9" fill="#2b2b2b"/>
+      <rect data-c="s1-performer" x="433" y="261" width="14" height="39" rx="5" fill="#2b2b2b"/>
+      <line data-c="s1-performer" x1="447" y1="268" x2="462" y2="250" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+      <line data-c="s1-mic" x1="420" y1="300" x2="420" y2="258" stroke="#2b2b2b" stroke-width="2"/><circle data-c="s1-mic" cx="420" cy="256" r="3" fill="#2b2b2b"/>
     </svg>
     <!-- tents + string lights -->
     <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <polygon points="605,380 650,315 695,380" fill="#9a9a9a"/><polygon points="638,380 650,345 662,380" fill="#5a5a5a"/>
-      <line x1="650" y1="315" x2="650" y2="298" stroke="#444444" stroke-width="2"/><polygon points="650,298 666,303 650,308" fill="#444444"/>
-      <polygon points="680,380 732,305 784,380" fill="#bdbdbd"/><polygon points="718,380 732,340 746,380" fill="#6a6a6a"/>
-      <line x1="732" y1="305" x2="732" y2="288" stroke="#444444" stroke-width="2"/><polygon points="732,288 748,293 732,298" fill="#444444"/>
-      <path d="M590,250 Q650,285 710,262 Q760,282 800,258" fill="none" stroke="#444444" stroke-width="1.5"/>
-      <g fill="#ffffff" stroke="#555555" stroke-width="1">
+      <polygon data-c="s1-tent-left" points="605,380 650,315 695,380" fill="#9a9a9a"/><polygon data-c="s1-tent-doors" points="638,380 650,345 662,380" fill="#5a5a5a"/>
+      <line data-c="s1-flags" x1="650" y1="315" x2="650" y2="298" stroke="#444444" stroke-width="2"/><polygon data-c="s1-flags" points="650,298 666,303 650,308" fill="#444444"/>
+      <polygon data-c="s1-tent-right" points="680,380 732,305 784,380" fill="#bdbdbd"/><polygon data-c="s1-tent-doors" points="718,380 732,340 746,380" fill="#6a6a6a"/>
+      <line data-c="s1-flags" x1="732" y1="305" x2="732" y2="288" stroke="#444444" stroke-width="2"/><polygon data-c="s1-flags" points="732,288 748,293 732,298" fill="#444444"/>
+      <path data-c="s1-lights-wire" d="M590,250 Q650,285 710,262 Q760,282 800,258" fill="none" stroke="#444444" stroke-width="1.5"/>
+      <g data-c="s1-bulbs" fill="#ffffff" stroke="#555555" stroke-width="1">
         <circle cx="610" cy="262" r="4"/><circle cx="635" cy="270" r="4"/><circle cx="660" cy="272" r="4"/><circle cx="685" cy="268" r="4"/>
         <circle cx="730" cy="268" r="4"/><circle cx="755" cy="271" r="4"/><circle cx="780" cy="266" r="4"/>
       </g>
     </svg>
     <!-- path on the ground, drawn in true perspective each frame -->
     <svg class="overlay" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <polygon id="s1-pathBody" fill="#9c9c9c"/>
-      <polyline id="s1-pathEdgeL" fill="none" stroke="#666666" stroke-linecap="round"/>
-      <polyline id="s1-pathEdgeR" fill="none" stroke="#666666" stroke-linecap="round"/>
-      <g id="s1-pathMarks" fill="#8a8a8a"></g>
+      <polygon data-c="s1-path" id="s1-pathBody" fill="#9c9c9c"/>
+      <polyline data-c="s1-path-edges" id="s1-pathEdgeL" fill="none" stroke="#666666" stroke-linecap="round"/>
+      <polyline data-c="s1-path-edges" id="s1-pathEdgeR" fill="none" stroke="#666666" stroke-linecap="round"/>
+      <g data-c="s1-path-marks" id="s1-pathMarks" fill="#8a8a8a"></g>
     </svg>
     <!-- crowd back -->
     <svg class="layer" data-r="1.2" data-e="394" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <g fill="#555555">
+      <g data-c="s1-crowd-back" fill="#555555">
         <circle cx="75" cy="395" r="11"/><rect x="61" y="406" width="28" height="50" rx="11"/>
         <circle cx="145" cy="393" r="11"/><rect x="131" y="404" width="28" height="50" rx="11"/>
         <circle cx="215" cy="396" r="11"/><rect x="201" y="407" width="28" height="50" rx="11"/>
@@ -105,14 +106,14 @@
         <circle cx="645" cy="395" r="11"/><rect x="631" y="406" width="28" height="50" rx="11"/>
         <circle cx="715" cy="393" r="11"/><rect x="701" y="404" width="28" height="50" rx="11"/>
       </g>
-      <g stroke="#555555" stroke-width="6" stroke-linecap="round">
+      <g data-c="s1-crowd-back" stroke="#555555" stroke-width="6" stroke-linecap="round">
         <line x1="295" y1="410" x2="305" y2="375"/><line x1="440" y1="410" x2="450" y2="372"/>
         <line x1="430" y1="410" x2="420" y2="372"/><line x1="650" y1="410" x2="660" y2="374"/>
       </g>
     </svg>
     <!-- crowd front -->
     <svg class="layer" data-r="1" data-e="432" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-      <g fill="#2b2b2b">
+      <g data-c="s1-crowd-front" fill="#2b2b2b">
         <circle cx="40" cy="432" r="14"/><rect x="22" y="446" width="36" height="60" rx="14"/>
         <circle cx="110" cy="430" r="14"/><rect x="92" y="444" width="36" height="60" rx="14"/>
         <circle cx="180" cy="433" r="14"/><rect x="162" y="447" width="36" height="60" rx="14"/>
@@ -125,7 +126,7 @@
         <circle cx="680" cy="430" r="14"/><rect x="662" y="444" width="36" height="60" rx="14"/>
         <circle cx="750" cy="433" r="14"/><rect x="732" y="447" width="36" height="60" rx="14"/>
       </g>
-      <g stroke="#2b2b2b" stroke-width="8" stroke-linecap="round">
+      <g data-c="s1-crowd-front" stroke="#2b2b2b" stroke-width="8" stroke-linecap="round">
         <line x1="120" y1="452" x2="135" y2="405"/><line x1="100" y1="452" x2="85" y2="405"/>
         <line x1="340" y1="454" x2="352" y2="408"/><line x1="480" y1="455" x2="494" y2="410"/>
         <line x1="460" y1="455" x2="446" y2="410"/><line x1="690" y1="452" x2="702" y2="406"/>
@@ -156,34 +157,34 @@
         </linearGradient>
       </defs>
       <g id="s2-cam">
-        <rect x="-200" y="-200" width="1200" height="900" fill="url(#s2-sky)"/>
+        <rect data-c="s2-sky" x="-200" y="-200" width="1200" height="900" fill="url(#s2-sky)"/>
         <!-- Stage -->
-        <rect x="270" y="150" width="260" height="110" fill="#8a8a8a"/>
-        <polygon points="250,150 550,150 528,118 272,118" fill="#3a3a3a"/>
-        <line x1="285" y1="134" x2="515" y2="134" stroke="#7a7a7a" stroke-width="1.5"/>
-        <rect x="260" y="122" width="10" height="138" fill="#3a3a3a"/>
-        <rect x="530" y="122" width="10" height="138" fill="#3a3a3a"/>
-        <polygon points="300,138 240,260 330,260" fill="url(#s2-beam)"/>
-        <polygon points="400,138 360,260 440,260" fill="url(#s2-beam)"/>
-        <polygon points="500,138 470,260 560,260" fill="url(#s2-beam)"/>
-        <g fill="#ffffff" stroke="#555555" stroke-width="1">
+        <rect data-c="s2-stage-back" x="270" y="150" width="260" height="110" fill="#8a8a8a"/>
+        <polygon data-c="s2-stage-roof" points="250,150 550,150 528,118 272,118" fill="#3a3a3a"/>
+        <line data-c="s2-stage-truss" x1="285" y1="134" x2="515" y2="134" stroke="#7a7a7a" stroke-width="1.5"/>
+        <rect data-c="s2-stage-roof" x="260" y="122" width="10" height="138" fill="#3a3a3a"/>
+        <rect data-c="s2-stage-roof" x="530" y="122" width="10" height="138" fill="#3a3a3a"/>
+        <polygon data-c="s2-beams" points="300,138 240,260 330,260" fill="url(#s2-beam)"/>
+        <polygon data-c="s2-beams" points="400,138 360,260 440,260" fill="url(#s2-beam)"/>
+        <polygon data-c="s2-beams" points="500,138 470,260 560,260" fill="url(#s2-beam)"/>
+        <g data-c="s2-lights" fill="#ffffff" stroke="#555555" stroke-width="1">
           <circle cx="300" cy="140" r="5"/><circle cx="400" cy="140" r="5"/><circle cx="500" cy="140" r="5"/>
         </g>
-        <rect x="226" y="200" width="30" height="60" fill="#2e2e2e"/>
-        <circle cx="241" cy="217" r="7" fill="#555555"/><circle cx="241" cy="242" r="10" fill="#555555"/>
-        <rect x="544" y="200" width="30" height="60" fill="#2e2e2e"/>
-        <circle cx="559" cy="217" r="7" fill="#555555"/><circle cx="559" cy="242" r="10" fill="#555555"/>
-        <circle cx="400" cy="206" r="9" fill="#2b2b2b"/>
-        <rect x="393" y="215" width="14" height="40" rx="5" fill="#2b2b2b"/>
-        <line x1="407" y1="222" x2="422" y2="202" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+        <rect data-c="s2-speakers" x="226" y="200" width="30" height="60" fill="#2e2e2e"/>
+        <circle data-c="s2-cones" cx="241" cy="217" r="7" fill="#555555"/><circle data-c="s2-cones" cx="241" cy="242" r="10" fill="#555555"/>
+        <rect data-c="s2-speakers" x="544" y="200" width="30" height="60" fill="#2e2e2e"/>
+        <circle data-c="s2-cones" cx="559" cy="217" r="7" fill="#555555"/><circle data-c="s2-cones" cx="559" cy="242" r="10" fill="#555555"/>
+        <circle data-c="s2-performer" cx="400" cy="206" r="9" fill="#2b2b2b"/>
+        <rect data-c="s2-performer" x="393" y="215" width="14" height="40" rx="5" fill="#2b2b2b"/>
+        <line data-c="s2-performer" x1="407" y1="222" x2="422" y2="202" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
         <!-- Ground -->
-        <rect x="-200" y="260" width="1200" height="440" fill="#7a7a7a"/>
+        <rect data-c="s2-ground" x="-200" y="260" width="1200" height="440" fill="#7a7a7a"/>
         <!-- Crowd is built in script so each person can be shoved -->
         <g id="s2-crowd"></g>
       </g>
       <!-- The viewer's own arms -->
       <g id="s2-armL">
-        <g fill="#1f1f1f">
+        <g data-c="s2-arms" fill="#1f1f1f">
           <path d="M150,500 L250,500 L320,330 L285,312 Z"/>
           <ellipse cx="305" cy="312" rx="24" ry="28" transform="rotate(25 305 312)"/>
           <rect x="283" y="268" width="11" height="40" rx="5.5" transform="rotate(25 288 288)"/>
@@ -192,10 +193,10 @@
           <rect x="321" y="276" width="10" height="34" rx="5" transform="rotate(25 326 293)"/>
           <rect x="318" y="306" width="10" height="28" rx="5" transform="rotate(70 323 320)"/>
         </g>
-        <path d="M165,500 L245,500 L262,455 L196,438 Z" fill="#4a4a4a"/>
+        <path data-c="s2-sleeves" d="M165,500 L245,500 L262,455 L196,438 Z" fill="#4a4a4a"/>
       </g>
       <g id="s2-armR">
-        <g fill="#1f1f1f">
+        <g data-c="s2-arms" fill="#1f1f1f">
           <path d="M650,500 L550,500 L480,330 L515,312 Z"/>
           <ellipse cx="495" cy="312" rx="24" ry="28" transform="rotate(-25 495 312)"/>
           <rect x="506" y="268" width="11" height="40" rx="5.5" transform="rotate(-25 512 288)"/>
@@ -204,7 +205,7 @@
           <rect x="469" y="276" width="10" height="34" rx="5" transform="rotate(-25 474 293)"/>
           <rect x="472" y="306" width="10" height="28" rx="5" transform="rotate(-70 477 320)"/>
         </g>
-        <path d="M635,500 L555,500 L538,455 L604,438 Z" fill="#4a4a4a"/>
+        <path data-c="s2-sleeves" d="M635,500 L555,500 L538,455 L604,438 Z" fill="#4a4a4a"/>
       </g>
     </svg>
 
@@ -234,60 +235,60 @@
         </linearGradient>
       </defs>
       <g id="s3-world">
-        <rect x="-4000" y="-4000" width="8800" height="8800" fill="url(#s3-sky)"/>
+        <rect data-c="s3-sky" x="-4000" y="-4000" width="8800" height="8800" fill="url(#s3-sky)"/>
 
         <!-- Stage (r 3.0) -->
         <g class="layer" data-r="3" data-k="3">
-          <rect x="120" y="90" width="560" height="200" fill="#8a8a8a"/>
-          <polygon points="80,90 720,90 690,48 110,48" fill="#3a3a3a"/>
-          <line x1="130" y1="70" x2="670" y2="70" stroke="#6a6a6a" stroke-width="2"/>
-          <rect x="104" y="56" width="16" height="234" fill="#3a3a3a"/>
-          <rect x="680" y="56" width="16" height="234" fill="#3a3a3a"/>
+          <rect data-c="s3-stage-back" x="120" y="90" width="560" height="200" fill="#8a8a8a"/>
+          <polygon data-c="s3-stage-roof" points="80,90 720,90 690,48 110,48" fill="#3a3a3a"/>
+          <line data-c="s3-stage-truss" x1="130" y1="70" x2="670" y2="70" stroke="#6a6a6a" stroke-width="2"/>
+          <rect data-c="s3-stage-roof" x="104" y="56" width="16" height="234" fill="#3a3a3a"/>
+          <rect data-c="s3-stage-roof" x="680" y="56" width="16" height="234" fill="#3a3a3a"/>
           <g id="s3-beams">
-            <polygon points="230,80 150,290 290,290" fill="url(#s3-beam)"/>
-            <polygon points="400,80 330,290 470,290" fill="url(#s3-beam)"/>
-            <polygon points="570,80 510,290 650,290" fill="url(#s3-beam)"/>
+            <polygon data-c="s3-beams" points="230,80 150,290 290,290" fill="url(#s3-beam)"/>
+            <polygon data-c="s3-beams" points="400,80 330,290 470,290" fill="url(#s3-beam)"/>
+            <polygon data-c="s3-beams" points="570,80 510,290 650,290" fill="url(#s3-beam)"/>
           </g>
-          <g fill="#ffffff" stroke="#555555" stroke-width="1.5">
+          <g data-c="s3-lights" fill="#ffffff" stroke="#555555" stroke-width="1.5">
             <circle cx="230" cy="82" r="7"/><circle cx="400" cy="82" r="7"/><circle cx="570" cy="82" r="7"/>
           </g>
-          <rect x="134" y="180" width="54" height="110" fill="#2e2e2e"/>
-          <circle class="cone" data-r0="13" cx="161" cy="210" r="13" fill="#555555"/>
-          <circle class="cone" data-r0="19" cx="161" cy="256" r="19" fill="#555555"/>
-          <rect x="612" y="180" width="54" height="110" fill="#2e2e2e"/>
-          <circle class="cone" data-r0="13" cx="639" cy="210" r="13" fill="#555555"/>
-          <circle class="cone" data-r0="19" cx="639" cy="256" r="19" fill="#555555"/>
+          <rect data-c="s3-speakers" x="134" y="180" width="54" height="110" fill="#2e2e2e"/>
+          <circle data-c="s3-cones" class="cone" data-r0="13" cx="161" cy="210" r="13" fill="#555555"/>
+          <circle data-c="s3-cones" class="cone" data-r0="19" cx="161" cy="256" r="19" fill="#555555"/>
+          <rect data-c="s3-speakers" x="612" y="180" width="54" height="110" fill="#2e2e2e"/>
+          <circle data-c="s3-cones" class="cone" data-r0="13" cx="639" cy="210" r="13" fill="#555555"/>
+          <circle data-c="s3-cones" class="cone" data-r0="19" cx="639" cy="256" r="19" fill="#555555"/>
           <!-- Performer -->
           <g id="s3-performer">
-            <line x1="372" y1="290" x2="372" y2="178" stroke="#2b2b2b" stroke-width="3"/>
-            <line x1="372" y1="178" x2="388" y2="172" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
+            <line data-c="s3-mic" x1="372" y1="290" x2="372" y2="178" stroke="#2b2b2b" stroke-width="3"/>
+            <line data-c="s3-mic" x1="372" y1="178" x2="388" y2="172" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
             <g id="s3-pBody">
-              <circle cx="400" cy="160" r="17" fill="#2b2b2b"/>
-              <path id="s3-smile" d="M391,163 Q400,172 409,163" fill="none" stroke="#bdbdbd" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
-              <rect x="386" y="178" width="28" height="70" rx="10" fill="#2b2b2b"/>
-              <line id="s3-armUp" x1="412" y1="190" x2="440" y2="150" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+              <circle data-c="s3-performer" cx="400" cy="160" r="17" fill="#2b2b2b"/>
+              <path data-c="s3-smile" id="s3-smile" d="M391,163 Q400,172 409,163" fill="none" stroke="#bdbdbd" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
+              <rect data-c="s3-performer" x="386" y="178" width="28" height="70" rx="10" fill="#2b2b2b"/>
+              <line data-c="s3-performer" id="s3-armUp" x1="412" y1="190" x2="440" y2="150" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
               <!-- thumbs up, toward the viewer -->
               <g id="s3-thumb" opacity="0">
-                <line x1="412" y1="190" x2="444" y2="176" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
-                <rect x="440" y="168" width="15" height="15" rx="5" fill="#2b2b2b"/>
-                <rect x="443" y="154" width="7" height="17" rx="3.5" fill="#2b2b2b"/>
+                <line data-c="s3-performer" x1="412" y1="190" x2="444" y2="176" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+                <rect data-c="s3-performer" x="440" y="168" width="15" height="15" rx="5" fill="#2b2b2b"/>
+                <rect data-c="s3-performer" x="443" y="154" width="7" height="17" rx="3.5" fill="#2b2b2b"/>
               </g>
-              <ellipse cx="404" cy="226" rx="20" ry="14" fill="#555555" transform="rotate(-25 404 226)"/>
-              <line x1="414" y1="220" x2="452" y2="196" stroke="#555555" stroke-width="4" stroke-linecap="round"/>
+              <ellipse data-c="s3-guitar" cx="404" cy="226" rx="20" ry="14" fill="#555555" transform="rotate(-25 404 226)"/>
+              <line data-c="s3-guitar" x1="414" y1="220" x2="452" y2="196" stroke="#555555" stroke-width="4" stroke-linecap="round"/>
             </g>
-            <rect x="388" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
-            <rect x="402" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+            <rect data-c="s3-performer" x="388" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+            <rect data-c="s3-performer" x="402" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
           </g>
-          <rect x="96" y="320" width="608" height="140" fill="#3a3a3a"/>
-          <rect x="96" y="290" width="608" height="34" fill="#4a4a4a"/>
-          <line x1="96" y1="290" x2="704" y2="290" stroke="#3a3a3a" stroke-width="3"/>
+          <rect data-c="s3-stage-front" x="96" y="320" width="608" height="140" fill="#3a3a3a"/>
+          <rect data-c="s3-stage-deck" x="96" y="290" width="608" height="34" fill="#4a4a4a"/>
+          <line data-c="s3-stage-edge" x1="96" y1="290" x2="704" y2="290" stroke="#3a3a3a" stroke-width="3"/>
         </g>
 
         <!-- Ground + barrier (r 1.6) -->
         <g class="layer" data-r="1.6" data-k="1.6">
-          <rect x="-4000" y="340" width="8800" height="5000" fill="#7a7a7a"/>
-          <rect x="-4000" y="324" width="8800" height="16" fill="#9a9a9a"/>
-          <g stroke="#8a8a8a" stroke-width="3">
+          <rect data-c="s3-ground" x="-4000" y="340" width="8800" height="5000" fill="#7a7a7a"/>
+          <rect data-c="s3-barrier" x="-4000" y="324" width="8800" height="16" fill="#9a9a9a"/>
+          <g data-c="s3-barrier-ticks" stroke="#8a8a8a" stroke-width="3">
             <line x1="-200" y1="324" x2="-200" y2="340"/><line x1="-80" y1="324" x2="-80" y2="340"/>
             <line x1="40" y1="324" x2="40" y2="340"/><line x1="160" y1="324" x2="160" y2="340"/>
             <line x1="280" y1="324" x2="280" y2="340"/><line x1="400" y1="324" x2="400" y2="340"/>
@@ -299,7 +300,7 @@
 
         <!-- Front row at the barrier (r 1.5) -->
         <g class="layer crowd" data-r="1.5" data-k="1.5">
-          <g fill="#8c8c8c">
+          <g data-c="s3-crowd-front-row" fill="#8c8c8c">
             <circle cx="30" cy="322" r="13"/><rect x="12" y="335" width="36" height="60" rx="13"/>
             <circle cx="110" cy="320" r="13"/><rect x="92" y="333" width="36" height="60" rx="13"/>
             <circle cx="190" cy="323" r="13"/><rect x="172" y="336" width="36" height="60" rx="13"/>
@@ -311,7 +312,7 @@
             <circle cx="690" cy="322" r="13"/><rect x="672" y="335" width="36" height="60" rx="13"/>
             <circle cx="770" cy="320" r="13"/><rect x="752" y="333" width="36" height="60" rx="13"/>
           </g>
-          <g stroke="#8c8c8c" stroke-width="7" stroke-linecap="round">
+          <g data-c="s3-crowd-front-row" stroke="#8c8c8c" stroke-width="7" stroke-linecap="round">
             <line x1="120" y1="342" x2="132" y2="290"/><line x1="100" y1="342" x2="88" y2="290"/>
             <line x1="280" y1="342" x2="292" y2="292"/>
             <line x1="460" y1="342" x2="472" y2="290"/><line x1="440" y1="342" x2="428" y2="290"/>
@@ -321,13 +322,13 @@
 
         <!-- Middle row (r 1.0) -->
         <g class="layer crowd" data-r="1" data-k="1">
-          <g fill="#5e5e5e">
+          <g data-c="s3-crowd-mid" fill="#5e5e5e">
             <circle cx="70" cy="362" r="19"/><rect x="44" y="381" width="52" height="120" rx="19"/>
             <circle cx="200" cy="358" r="19"/><rect x="174" y="377" width="52" height="120" rx="19"/>
             <circle cx="600" cy="358" r="19"/><rect x="574" y="377" width="52" height="120" rx="19"/>
             <circle cx="730" cy="362" r="19"/><rect x="704" y="381" width="52" height="120" rx="19"/>
           </g>
-          <g stroke="#5e5e5e" stroke-width="10" stroke-linecap="round">
+          <g data-c="s3-crowd-mid" stroke="#5e5e5e" stroke-width="10" stroke-linecap="round">
             <line x1="215" y1="390" x2="238" y2="320"/>
             <line x1="585" y1="390" x2="562" y2="320"/>
             <line x1="745" y1="394" x2="768" y2="324"/>
@@ -336,7 +337,7 @@
 
         <!-- Nearest heads (r 0.6) -->
         <g class="layer crowd" data-r="0.6" data-k="0.6">
-          <g fill="#3a3a3a">
+          <g data-c="s3-crowd-nearest" fill="#3a3a3a">
             <circle cx="-4" cy="420" r="38"/><rect x="-52" y="456" width="96" height="80" rx="38"/>
             <circle cx="804" cy="420" r="38"/><rect x="756" y="456" width="96" height="80" rx="38"/>
           </g>
@@ -345,7 +346,7 @@
         <!-- Two rows that stand between the viewer and the barrier at the start,
              built from the same crowd figures, leaving a man-sized gap in the middle -->
         <g class="layer crowd" data-r="-0.6" data-k="1.6">
-          <g fill="#4a4a4a">
+          <g data-c="s3-blockers-1" fill="#4a4a4a">
             <circle cx="60" cy="312" r="28"/><rect x="24" y="340" width="72" height="200" rx="28"/>
             <circle cx="166" cy="318" r="28"/><rect x="130" y="346" width="72" height="200" rx="28"/>
             <circle cx="272" cy="314" r="28"/><rect x="236" y="342" width="72" height="200" rx="28"/>
@@ -353,12 +354,12 @@
             <circle cx="634" cy="318" r="28"/><rect x="598" y="346" width="72" height="200" rx="28"/>
             <circle cx="740" cy="312" r="28"/><rect x="704" y="340" width="72" height="200" rx="28"/>
           </g>
-          <g stroke="#4a4a4a" stroke-width="14" stroke-linecap="round">
+          <g data-c="s3-blockers-1" stroke="#4a4a4a" stroke-width="14" stroke-linecap="round">
             <line x1="190" y1="370" x2="214" y2="276"/><line x1="610" y1="370" x2="586" y2="276"/>
           </g>
         </g>
         <g class="layer crowd" data-r="-1.4" data-k="0.8">
-          <g fill="#2e2e2e">
+          <g data-c="s3-blockers-2" fill="#2e2e2e">
             <circle cx="30" cy="300" r="46"/><rect x="-30" y="346" width="120" height="280" rx="46"/>
             <circle cx="150" cy="306" r="46"/><rect x="90" y="352" width="120" height="280" rx="46"/>
             <circle cx="262" cy="320" r="46"/><rect x="202" y="366" width="120" height="280" rx="46"/>
@@ -366,7 +367,7 @@
             <circle cx="650" cy="306" r="46"/><rect x="590" y="352" width="120" height="280" rx="46"/>
             <circle cx="770" cy="300" r="46"/><rect x="710" y="346" width="120" height="280" rx="46"/>
           </g>
-          <g stroke="#2e2e2e" stroke-width="22" stroke-linecap="round">
+          <g data-c="s3-blockers-2" stroke="#2e2e2e" stroke-width="22" stroke-linecap="round">
             <line x1="128" y1="390" x2="96" y2="236"/><line x1="680" y1="388" x2="712" y2="240"/>
           </g>
         </g>
@@ -374,7 +375,7 @@
 
       <!-- The viewer's own hands -->
       <g id="s3-handL">
-        <g fill="#1f1f1f">
+        <g data-c="s3-hands" fill="#1f1f1f">
           <path d="M190,500 L280,500 L340,372 L306,356 Z"/>
           <ellipse cx="324" cy="352" rx="23" ry="27" transform="rotate(22 324 352)"/>
           <rect x="303" y="308" width="11" height="40" rx="5.5" transform="rotate(22 308 328)"/>
@@ -383,10 +384,10 @@
           <rect x="341" y="316" width="10" height="34" rx="5" transform="rotate(22 346 333)"/>
           <rect x="337" y="346" width="10" height="28" rx="5" transform="rotate(68 342 360)"/>
         </g>
-        <path d="M200,500 L274,500 L290,462 L228,446 Z" fill="#4a4a4a"/>
+        <path data-c="s3-sleeves" d="M200,500 L274,500 L290,462 L228,446 Z" fill="#4a4a4a"/>
       </g>
       <g id="s3-handR">
-        <g fill="#1f1f1f">
+        <g data-c="s3-hands" fill="#1f1f1f">
           <path d="M610,500 L520,500 L460,372 L494,356 Z"/>
           <ellipse cx="476" cy="352" rx="23" ry="27" transform="rotate(-22 476 352)"/>
           <rect x="486" y="308" width="11" height="40" rx="5.5" transform="rotate(-22 492 328)"/>
@@ -395,7 +396,7 @@
           <rect x="449" y="316" width="10" height="34" rx="5" transform="rotate(-22 454 333)"/>
           <rect x="453" y="346" width="10" height="28" rx="5" transform="rotate(-68 458 360)"/>
         </g>
-        <path d="M600,500 L526,500 L510,462 L572,446 Z" fill="#4a4a4a"/>
+        <path data-c="s3-sleeves" d="M600,500 L526,500 L510,462 L572,446 Z" fill="#4a4a4a"/>
       </g>
     </svg>
 
@@ -413,5 +414,7 @@
 <script src="js/stage2-sides.js"></script>
 <script src="js/stage3-forward.js"></script>
 <script src="js/main.js"></script>
+<script src="js/appearance-defaults.js"></script>
+<script src="js/panel.js"></script>
 </body>
 </html>

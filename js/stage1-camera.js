@@ -55,7 +55,7 @@ Seq.stage1 = (() => {
   }
   for (let d = -9; d <= 0.85; d += 0.45) for (const side of [-1, 1]) {
     const el = document.createElementNS(NS, 'line');
-    el.setAttribute('stroke', '#3e3e3e'); el.setAttribute('stroke-linecap', 'round');
+    el.setAttribute('stroke', '#3e3e3e'); el.setAttribute('stroke-linecap', 'round'); el.dataset.c = 's1-posts';
     postsG.appendChild(el); posts.push({ el, d, side });
   }
   function drawPath(left) {
