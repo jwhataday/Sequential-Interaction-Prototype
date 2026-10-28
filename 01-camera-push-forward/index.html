@@ -1,0 +1,454 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Camera Push Forward</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one letterboxed stage frame centered on a quiet page; signifiers float inside the frame, bottom center. */
+:root {
+  --page: #e6e6e4;
+  --ink: #2b2b2b;
+  --muted: #6e6e6c;
+  --frame-edge: #c9c9c6;
+  --pill: rgba(255,255,255,0.82);
+  --pill-edge: rgba(43,43,43,0.18);
+  --yellow: #f6c90e;
+  --yellow-deep: #d9a900;
+  --font-ui: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+    --pill: rgba(20,20,20,0.72); --pill-edge: rgba(255,255,255,0.16); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+  --pill: rgba(20,20,20,0.72); --pill-edge: rgba(255,255,255,0.16); color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--ink); font-family: var(--font-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overflow: hidden;
+}
+.top { width: min(100%, calc((100vh - 104px) * 1.6)); display: flex; justify-content: flex-end; }
+.reset {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--pill-edge); background: var(--pill); color: var(--ink); cursor: pointer;
+}
+.reset:hover { background: var(--page); }
+.reset:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reset svg { width: 16px; height: 16px; }
+.frame {
+  position: relative; width: min(100%, calc((100vh - 104px) * 1.6));
+  aspect-ratio: 8 / 5; max-width: 100%;
+  overflow: hidden; border-radius: 6px; outline: 1px solid var(--frame-edge);
+  background: #f2f2f2; cursor: default; contain: paint;
+}
+/* Vanishing point sits on the stage floor: 440,300 in the 800×500 scene */
+.layer {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  will-change: transform, filter; overflow: visible;
+}
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+/* Signifiers */
+.hint {
+  position: absolute; left: 50%; bottom: 6%;
+  transform: translate(-50%, 12px); opacity: 0;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 16px 10px 12px; border-radius: 999px;
+  background: var(--pill); border: 1px solid var(--pill-edge);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity 420ms ease, transform 520ms cubic-bezier(.2,1.4,.4,1);
+  pointer-events: none;
+}
+.hint.in { opacity: 1; transform: translate(-50%, 0); }
+.hint.out { opacity: 0; transform: translate(-50%, 8px) scale(0.92); transition-duration: 260ms; }
+.hand { width: 30px; height: 30px; color: var(--ink); animation: tap 1.3s ease-in-out infinite; transform-origin: 40% 90%; }
+@keyframes tap {
+  0%, 55%, 100% { transform: translateY(0) rotate(0); }
+  65% { transform: translateY(3px) rotate(-6deg); }
+  75% { transform: translateY(0) rotate(0); }
+  82% { transform: translateY(3px) rotate(-6deg); }
+  92% { transform: translateY(0) rotate(0); }
+}
+.dots { display: flex; gap: 8px; }
+.dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--ink); box-sizing: border-box; background: transparent;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.dot.on { background: var(--yellow); border-color: var(--yellow-deep); animation: pop 420ms cubic-bezier(.2,1.8,.4,1); }
+@keyframes pop { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+.ripple {
+  position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  border: 2px solid var(--yellow); pointer-events: none;
+  animation: ripple 520ms ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(4.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hand { animation: none; } }
+</style>
+
+<div class="top">
+  <button class="reset" id="reset" type="button" aria-label="Reset">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2.5 2v3.5H6"/>
+    </svg>
+  </button>
+</div>
+
+<div class="frame" id="frame" aria-label="Outdoor festival scene seen from far away. Click twice to push the camera forward.">
+  <!-- Each layer: r = its distance from the camera at the end position (the back of the crowd, front row = 1) -->
+  <!-- sky, sun, clouds -->
+  <svg class="layer" data-r="200" data-e="330" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d9d9"/><stop offset="1" stop-color="#f2f2f2"/></linearGradient></defs>
+    <rect x="-2000" y="-2000" width="4800" height="2400" fill="url(#sky)"/>
+    <circle cx="660" cy="80" r="38" fill="#ffffff" stroke="#c4c4c4" stroke-width="2"/>
+    <g fill="#ffffff" opacity="0.9">
+      <ellipse cx="300" cy="70" rx="50" ry="16"/><ellipse cx="330" cy="60" rx="32" ry="16"/>
+      <ellipse cx="500" cy="110" rx="40" ry="12"/><ellipse cx="520" cy="102" rx="24" ry="12"/>
+    </g>
+  </svg>
+  <!-- distant hills -->
+  <svg class="layer" data-r="15" data-e="318" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <path d="M-3000,320 L0,320 Q120,250 260,300 T520,290 T800,280 L3800,280 L3800,2000 L-3000,2000 Z" fill="#b5b5b5"/>
+    <path d="M-3000,350 L0,350 Q150,300 320,340 T640,330 T800,335 L3800,335 L3800,2000 L-3000,2000 Z" fill="#a0a0a0"/>
+  </svg>
+  <!-- ground plane -->
+  <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <rect x="-20000" y="378" width="40000" height="20000" fill="#7a7a7a"/>
+  </svg>
+  <!-- ferris wheel -->
+  <svg class="layer" data-r="2.4" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#555555" stroke-width="3" fill="none">
+      <line x1="140" y1="200" x2="95" y2="380"/><line x1="140" y1="200" x2="185" y2="380"/>
+      <circle cx="140" cy="200" r="90"/><circle cx="140" cy="200" r="70" stroke-width="1.5"/>
+      <line x1="50" y1="200" x2="230" y2="200" stroke-width="1.5"/><line x1="140" y1="110" x2="140" y2="290" stroke-width="1.5"/>
+      <line x1="76.4" y1="136.4" x2="203.6" y2="263.6" stroke-width="1.5"/><line x1="203.6" y1="136.4" x2="76.4" y2="263.6" stroke-width="1.5"/>
+    </g>
+    <circle cx="140" cy="200" r="7" fill="#444444"/>
+    <g fill="#6a6a6a">
+      <rect x="222" y="202" width="16" height="12" rx="3"/><rect x="195.6" y="265.6" width="16" height="12" rx="3"/>
+      <rect x="132" y="292" width="16" height="12" rx="3"/><rect x="68.4" y="265.6" width="16" height="12" rx="3"/>
+      <rect x="42" y="202" width="16" height="12" rx="3"/><rect x="68.4" y="138.4" width="16" height="12" rx="3"/>
+      <rect x="132" y="112" width="16" height="12" rx="3"/><rect x="195.6" y="138.4" width="16" height="12" rx="3"/>
+    </g>
+  </svg>
+  <!-- stage: the destination -->
+  <svg class="layer" data-r="2.2" data-e="292" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <rect x="330" y="200" width="220" height="100" fill="#8a8a8a"/>
+    <polygon points="310,200 570,200 550,172 330,172" fill="#3a3a3a"/>
+    <line x1="340" y1="186" x2="540" y2="186" stroke="#7a7a7a" stroke-width="1.5"/>
+    <rect x="320" y="175" width="10" height="125" fill="#3a3a3a"/><rect x="550" y="175" width="10" height="125" fill="#3a3a3a"/>
+    <rect x="315" y="300" width="250" height="40" fill="#4a4a4a"/>
+    <rect x="288" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="302" cy="265" r="7" fill="#555555"/><circle cx="302" cy="287" r="9" fill="#555555"/>
+    <rect x="564" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="578" cy="265" r="7" fill="#555555"/><circle cx="578" cy="287" r="9" fill="#555555"/>
+    <circle cx="440" cy="252" r="9" fill="#2b2b2b"/>
+    <rect x="433" y="261" width="14" height="39" rx="5" fill="#2b2b2b"/>
+    <line x1="447" y1="268" x2="462" y2="250" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+    <line x1="420" y1="300" x2="420" y2="258" stroke="#2b2b2b" stroke-width="2"/><circle cx="420" cy="256" r="3" fill="#2b2b2b"/>
+  </svg>
+  <!-- tents + string lights -->
+  <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <polygon points="605,380 650,315 695,380" fill="#9a9a9a"/><polygon points="638,380 650,345 662,380" fill="#5a5a5a"/>
+    <line x1="650" y1="315" x2="650" y2="298" stroke="#444444" stroke-width="2"/><polygon points="650,298 666,303 650,308" fill="#444444"/>
+    <polygon points="680,380 732,305 784,380" fill="#bdbdbd"/><polygon points="718,380 732,340 746,380" fill="#6a6a6a"/>
+    <line x1="732" y1="305" x2="732" y2="288" stroke="#444444" stroke-width="2"/><polygon points="732,288 748,293 732,298" fill="#444444"/>
+    <path d="M590,250 Q650,285 710,262 Q760,282 800,258" fill="none" stroke="#444444" stroke-width="1.5"/>
+    <g fill="#ffffff" stroke="#555555" stroke-width="1">
+      <circle cx="610" cy="262" r="4"/><circle cx="635" cy="270" r="4"/><circle cx="660" cy="272" r="4"/><circle cx="685" cy="268" r="4"/>
+      <circle cx="730" cy="268" r="4"/><circle cx="755" cy="271" r="4"/><circle cx="780" cy="266" r="4"/>
+    </g>
+  </svg>
+  <!-- path on the ground, drawn in true perspective each frame -->
+  <svg class="overlay" id="pathLayer" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <polygon id="pathBody" fill="#9c9c9c"/>
+    <polyline id="pathEdgeL" fill="none" stroke="#666666" stroke-linecap="round"/>
+    <polyline id="pathEdgeR" fill="none" stroke="#666666" stroke-linecap="round"/>
+    <g id="pathMarks" fill="#8a8a8a"></g>
+  </svg>
+  <!-- crowd back -->
+  <svg class="layer" data-r="1.2" data-e="394" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <g fill="#555555">
+      <circle cx="75" cy="395" r="11"/><rect x="61" y="406" width="28" height="50" rx="11"/>
+      <circle cx="145" cy="393" r="11"/><rect x="131" y="404" width="28" height="50" rx="11"/>
+      <circle cx="215" cy="396" r="11"/><rect x="201" y="407" width="28" height="50" rx="11"/>
+      <circle cx="290" cy="394" r="11"/><rect x="276" y="405" width="28" height="50" rx="11"/>
+      <circle cx="365" cy="395" r="11"/><rect x="351" y="406" width="28" height="50" rx="11"/>
+      <circle cx="435" cy="393" r="11"/><rect x="421" y="404" width="28" height="50" rx="11"/>
+      <circle cx="505" cy="396" r="11"/><rect x="491" y="407" width="28" height="50" rx="11"/>
+      <circle cx="575" cy="394" r="11"/><rect x="561" y="405" width="28" height="50" rx="11"/>
+      <circle cx="645" cy="395" r="11"/><rect x="631" y="406" width="28" height="50" rx="11"/>
+      <circle cx="715" cy="393" r="11"/><rect x="701" y="404" width="28" height="50" rx="11"/>
+    </g>
+    <g stroke="#555555" stroke-width="6" stroke-linecap="round">
+      <line x1="295" y1="410" x2="305" y2="375"/><line x1="440" y1="410" x2="450" y2="372"/>
+      <line x1="430" y1="410" x2="420" y2="372"/><line x1="650" y1="410" x2="660" y2="374"/>
+    </g>
+  </svg>
+  <!-- crowd front -->
+  <svg class="layer" data-r="1" data-e="432" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+    <g fill="#2b2b2b">
+      <circle cx="40" cy="432" r="14"/><rect x="22" y="446" width="36" height="60" rx="14"/>
+      <circle cx="110" cy="430" r="14"/><rect x="92" y="444" width="36" height="60" rx="14"/>
+      <circle cx="180" cy="433" r="14"/><rect x="162" y="447" width="36" height="60" rx="14"/>
+      <circle cx="250" cy="431" r="14"/><rect x="232" y="445" width="36" height="60" rx="14"/>
+      <circle cx="330" cy="432" r="14"/><rect x="312" y="446" width="36" height="60" rx="14"/>
+      <circle cx="400" cy="430" r="14"/><rect x="382" y="444" width="36" height="60" rx="14"/>
+      <circle cx="470" cy="433" r="14"/><rect x="452" y="447" width="36" height="60" rx="14"/>
+      <circle cx="540" cy="431" r="14"/><rect x="522" y="445" width="36" height="60" rx="14"/>
+      <circle cx="610" cy="432" r="14"/><rect x="592" y="446" width="36" height="60" rx="14"/>
+      <circle cx="680" cy="430" r="14"/><rect x="662" y="444" width="36" height="60" rx="14"/>
+      <circle cx="750" cy="433" r="14"/><rect x="732" y="447" width="36" height="60" rx="14"/>
+    </g>
+    <g stroke="#2b2b2b" stroke-width="8" stroke-linecap="round">
+      <line x1="120" y1="452" x2="135" y2="405"/><line x1="100" y1="452" x2="85" y2="405"/>
+      <line x1="340" y1="454" x2="352" y2="408"/><line x1="480" y1="455" x2="494" y2="410"/>
+      <line x1="460" y1="455" x2="446" y2="410"/><line x1="690" y1="452" x2="702" y2="406"/>
+    </g>
+  </svg>
+
+  <!-- path-side posts nearer than the crowd -->
+  <svg class="overlay" id="postLayer" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"><g id="posts"></g></svg>
+
+  <!-- Signifiers: cursor hand + two progress circles -->
+  <div class="hint" id="hint" aria-hidden="true">
+    <svg class="hand" viewBox="0 0 32 32">
+      <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+    <div class="dots" id="dots"><span class="dot"></span><span class="dot"></span></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const frame = document.getElementById('frame');
+  const hint = document.getElementById('hint');
+  const dotsWrap = document.getElementById('dots');
+  const dots = [...dotsWrap.children];
+  const layers = [...frame.querySelectorAll('.layer')].map(el => ({
+    el, r: parseFloat(el.dataset.r), e: parseFloat(el.dataset.e), blur: !!el.dataset.blur, prev: null
+  }));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // The camera starts far out and travels TRAVEL units; it ends NEAR units past the old
+  // reference point, standing directly behind the front row of the crowd.
+  const TRAVEL = 8.6, NEAR = 0.4;
+  // Eye level: each layer has a line (data-e) at a standing person's eye height. That line is
+  // pinned to one horizon on screen, so every head in the crowd sits on the viewer's eye line.
+  const HORIZON = 270;            // screen y, in 800×500 viewBox units
+  for (const L of layers) L.el.style.transformOrigin = `55% ${L.e / 5}%`;
+  let count = 0, phase = 'idle', introTimer;
+
+  // ---------- Music: a synthesized kick, bass and hats, heard through a low-pass "distance" filter ----------
+  const music = (() => {
+    const BEAT = 60 / 124;
+    let ac = null, lp, master;
+    function start() {
+      if (ac) { ac.resume?.(); return; }
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; return; }
+      lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 200; lp.Q.value = 0.7;
+      master = ac.createGain(); master.gain.value = 0;
+      lp.connect(master); master.connect(ac.destination);
+      const noise = ac.createBuffer(1, ac.sampleRate * 0.2, ac.sampleRate);
+      const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const notes = [41.2, 41.2, 49, 36.7];
+      let next = ac.currentTime + 0.05, n = 0;
+      const kick = t => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.16);
+        g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        o.connect(g); g.connect(lp); o.start(t); o.stop(t + 0.4);
+      };
+      const hat = t => {
+        const s = ac.createBufferSource(); s.buffer = noise;
+        const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 7000;
+        const g = ac.createGain(); g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+        s.connect(f); f.connect(g); g.connect(lp); s.start(t); s.stop(t + 0.06);
+      };
+      const bass = (t, hz) => {
+        const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+        o.type = 'sawtooth'; o.frequency.value = hz * 2; f.type = 'lowpass'; f.frequency.value = 520;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + BEAT * 0.9);
+        o.connect(f); f.connect(g); g.connect(lp); o.start(t); o.stop(t + BEAT);
+      };
+      setInterval(() => {
+        while (next < ac.currentTime + 0.25) {
+          kick(next); hat(next + BEAT / 2); bass(next + BEAT / 2, notes[Math.floor(n / 4) % 4]);
+          next += BEAT; n++;
+        }
+      }, 60);
+    }
+    // gain 0..1, cutoff in Hz (low = far away and muffled), tc = smoothing time
+    function set(gain, cutoff, tc = 0.15) {
+      if (!ac) return;
+      master.gain.setTargetAtTime(gain, ac.currentTime, tc);
+      lp.frequency.setTargetAtTime(cutoff, ac.currentTime, tc);
+    }
+    // 1 on each kick, decaying to 0 before the next
+    function beat() {
+      const t = ac ? ac.currentTime - 0.05 : performance.now() / 1000;
+      return Math.exp(-((((t % BEAT) + BEAT) % BEAT) / BEAT) * 7);
+    }
+    return { start, set, beat, BEAT };
+  })();
+
+
+
+  // True perspective: apparent size = r / (distance still between camera and layer).
+  function setCamera(c, moving = false) {
+    const left = TRAVEL - c - NEAR;
+    drawPath(left);
+    for (const L of layers) {
+      const s = L.r / (L.r + left);
+      L.el.style.transform = `translateY(${((HORIZON - L.e) / 5).toFixed(3)}%) scale(${s})`;
+      let b = 0;
+      if (moving && L.prev) b = Math.min(6, (Math.abs(s - L.prev) / s) * 60 * (L.blur ? 1.6 : 0.6));
+      // at rest, the heads right in front of the lens sit slightly out of focus
+      if (!moving && L.blur && s > 2.2) b = Math.max(b, 1.2);
+      L.el.style.filter = b > 0.2 ? `blur(${b.toFixed(2)}px)` : '';
+      L.prev = moving ? s : null;
+    }
+  }
+
+  // Ground path. A ground point at depth z (front row of the crowd = r 1) lands at
+  // y = HORIZON + EYE / z and x = CX + X / z. EYE matches the crowd's eye-to-feet drop.
+  const EYE = 74, CX = 440, PATH_W = 46, PATH_END = 2.0;
+  const NS = 'http://www.w3.org/2000/svg';
+  const pathBody = document.getElementById('pathBody');
+  const edgeL = document.getElementById('pathEdgeL'), edgeR = document.getElementById('pathEdgeR');
+  const marksG = document.getElementById('pathMarks'), postsG = document.getElementById('posts');
+  // pebbles/ruts on the path and posts along its edges, at fixed world depths
+  const marks = [], posts = [];
+  for (let d = -9; d < PATH_END; d += 0.23) {
+    const el = document.createElementNS(NS, 'ellipse'); marksG.appendChild(el);
+    marks.push({ el, d, x: ((d * 37.3) % 1 + 1) % 1 * 1.4 - 0.7 });
+  }
+  for (let d = -9; d <= 0.85; d += 0.45) for (const side of [-1, 1]) {
+    const el = document.createElementNS(NS, 'line');
+    el.setAttribute('stroke', '#3e3e3e'); el.setAttribute('stroke-linecap', 'round');
+    postsG.appendChild(el); posts.push({ el, d, side });
+  }
+  const P = z => [HORIZON + EYE / z];
+  function drawPath(left) {
+    const zNear = 0.22, zFar = PATH_END + left;
+    if (zFar <= zNear) { pathBody.setAttribute('points', ''); return; }
+    const pts = [], L = [], R = [];
+    const N = 24;
+    for (let i = 0; i <= N; i++) {
+      const z = zNear * Math.pow(zFar / zNear, i / N);
+      const y = HORIZON + EYE / z;
+      L.push(`${(CX - PATH_W / z).toFixed(1)},${y.toFixed(1)}`);
+      R.push(`${(CX + PATH_W / z).toFixed(1)},${y.toFixed(1)}`);
+    }
+    pathBody.setAttribute('points', L.concat(R.slice().reverse()).join(' '));
+    edgeL.setAttribute('points', L.join(' ')); edgeR.setAttribute('points', R.join(' '));
+    const sw = Math.min(6, 2.2 / zNear * 0.25);
+    edgeL.setAttribute('stroke-width', sw); edgeR.setAttribute('stroke-width', sw);
+    for (const m of marks) {
+      const z = m.d + left;
+      if (z < 0.2 || z > zFar) { m.el.setAttribute('rx', 0); continue; }
+      m.el.setAttribute('cx', (CX + m.x * PATH_W / z).toFixed(1));
+      m.el.setAttribute('cy', (HORIZON + EYE / z).toFixed(1));
+      m.el.setAttribute('rx', (5 / z).toFixed(2)); m.el.setAttribute('ry', (1.6 / z).toFixed(2));
+    }
+    for (const q of posts) {
+      const z = q.d + left;
+      if (z < 0.12) { q.el.setAttribute('stroke-width', 0); continue; }
+      const x = CX + q.side * (PATH_W + 14) / z;
+      q.el.setAttribute('x1', x.toFixed(1)); q.el.setAttribute('x2', x.toFixed(1));
+      q.el.setAttribute('y1', (HORIZON + EYE / z).toFixed(1));
+      q.el.setAttribute('y2', (HORIZON + (EYE - 26) / z).toFixed(1));
+      q.el.setAttribute('stroke-width', Math.min(40, 3.2 / z).toFixed(2));
+      q.el.setAttribute('opacity', Math.min(1, (z - 0.12) / 0.15).toFixed(2));
+    }
+  }
+
+  function intro() {
+    count = 0; phase = 'armed';
+    dots.forEach(d => d.classList.remove('on'));
+    hint.classList.remove('out');
+    clearTimeout(introTimer);
+    introTimer = setTimeout(() => hint.classList.add('in'), 700);
+  }
+
+  function ripple(x, y) {
+    const r = frame.getBoundingClientRect();
+    const px = Math.min(Math.max(x - r.left, 0), r.width);
+    const py = Math.min(Math.max(y - r.top, 0), r.height);
+    const el = document.createElement('span');
+    el.className = 'ripple'; el.style.left = px + 'px'; el.style.top = py + 'px';
+    frame.appendChild(el); setTimeout(() => el.remove(), 560);
+  }
+
+  function register(x, y) {
+    if (phase !== 'armed') return;
+    hint.classList.add('in'); clearTimeout(introTimer);
+    dots[count].classList.add('on');
+    count++;
+    ripple(x, y);
+    if (count === 2) { phase = 'pushing'; setTimeout(push, 260); }
+  }
+
+  // A tiny crouch back, then an instant burst that settles like a dolly braking.
+  const DUR = 1700, CROUCH = 0.08;
+  const ease = x => 1 - Math.pow(1 - x, 4);
+  const curve = p => p < CROUCH ? -0.25 * Math.sin((p / CROUCH) * Math.PI)
+                                : ease((p - CROUCH) / (1 - CROUCH));
+
+  function push() {
+    hint.classList.add('out');
+    if (reduce) { setCamera(TRAVEL); done(); return; }
+    let start = null;
+    function step(now) {
+      if (start === null) start = now;
+      const p = Math.min(1, (now - start) / DUR);
+      setCamera(TRAVEL * curve(p), p < 1);
+      if (p > 0.55) music.set(0.42, 260, 0.35);
+      if (p < 1) requestAnimationFrame(step); else { setCamera(TRAVEL); done(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function done() {
+    phase = 'done';
+    music.set(0.42, 260, 0.35);
+  }
+
+  function reset() {
+    if (phase === 'pushing' || phase === 'resetting') return;
+    music.set(0, 260, 0.25);
+    hint.classList.remove('in');
+    if (reduce) { setCamera(0); intro(); return; }
+    let start = null; phase = 'resetting';
+    function back(now) {
+      if (start === null) start = now;
+      const p = Math.min(1, (now - start) / 900);
+      const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      setCamera(TRAVEL * (1 - e));
+      if (p < 1) requestAnimationFrame(back); else { setCamera(0); intro(); }
+    }
+    requestAnimationFrame(back);
+  }
+
+  // Any click counts: left, right, middle, or a tap.
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest('.reset')) return;
+    music.start();
+    register(e.clientX, e.clientY);
+  });
+  document.getElementById('reset').addEventListener('click', reset);
+
+  setCamera(0);
+  intro();
+})();
+</script>
+
+</body></html>

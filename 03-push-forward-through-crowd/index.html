@@ -1,0 +1,498 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Push Forward</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one letterboxed scene frame centered on a quiet page; a reset icon sits above its top-right corner. */
+:root {
+  --page: #e6e6e4;
+  --ink: #2b2b2b;
+  --frame-edge: #c9c9c6;
+  --pill: rgba(255,255,255,0.84);
+  --pill-edge: rgba(43,43,43,0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #141414; --ink: #e8e8e6; --frame-edge: #2c2c2c;
+    --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #141414; --ink: #e8e8e6; --frame-edge: #2c2c2c;
+  --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--ink);
+  font: 14px/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overflow: hidden;
+}
+.top { width: min(100%, calc((100vh - 104px) * 1.6)); display: flex; justify-content: flex-end; }
+.reset {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--pill-edge); background: var(--pill); color: var(--ink); cursor: pointer;
+}
+.reset:hover { background: var(--page); }
+.reset:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reset svg { width: 16px; height: 16px; }
+.frame {
+  position: relative; width: min(100%, calc((100vh - 104px) * 1.6));
+  aspect-ratio: 8 / 5; max-width: 100%;
+  overflow: hidden; border-radius: 6px; outline: 1px solid var(--frame-edge);
+  background: #e4e4e4; cursor: grab; touch-action: none; contain: paint;
+}
+.frame.holding { cursor: grabbing; }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.scene g { transform-box: view-box; }
+
+/* Signifier: a hand swiping forward over the gap */
+.hint {
+  position: absolute; left: 50%; top: 50%; width: 64px; height: 170px;
+  transform: translate(-50%, -22%); opacity: 0;
+  transition: opacity 420ms ease; pointer-events: none;
+}
+.hint.in { opacity: 1; }
+.hint .trail {
+  position: absolute; left: 50%; top: 6px; width: 4px; height: 124px; margin-left: -2px; border-radius: 2px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.95));
+  transform-origin: 50% 100%; animation: trail 1.5s ease-in-out infinite;
+}
+.hint .hand {
+  position: absolute; left: 50%; bottom: 0; width: 38px; height: 38px; margin-left: -15px;
+  color: #2b2b2b; animation: swipeUp 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.7));
+}
+@keyframes swipeUp {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { transform: translateY(0); opacity: 1; }
+  22% { transform: translateY(4px) scale(0.92); }
+  70% { transform: translateY(-114px) scale(0.92); opacity: 1; }
+  88%, 100% { transform: translateY(-120px) scale(1); opacity: 0; }
+}
+@keyframes trail {
+  0%, 22% { transform: scaleY(0); opacity: 0; }
+  70% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .hint .hand, .hint .trail { animation-duration: 3s; } }
+</style>
+
+<div class="top">
+  <button class="reset" id="reset" type="button" aria-label="Reset">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2.5 2v3.5H6"/>
+    </svg>
+  </button>
+</div>
+
+<div class="frame" id="frame" aria-label="In the crowd at an outdoor concert, with a gap ahead toward the stage. Press and swipe forward to move through it.">
+  <svg class="scene" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#cfcfcf"/><stop offset="1" stop-color="#ededed"/>
+      </linearGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.7"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g id="world">
+      <rect x="-4000" y="-4000" width="8800" height="8800" fill="url(#sky)"/>
+
+      <!-- Stage (r 3.0) -->
+      <g class="layer" data-r="3" data-k="3">
+        <rect x="120" y="90" width="560" height="200" fill="#8a8a8a"/>
+        <polygon points="80,90 720,90 690,48 110,48" fill="#3a3a3a"/>
+        <line x1="130" y1="70" x2="670" y2="70" stroke="#6a6a6a" stroke-width="2"/>
+        <rect x="104" y="56" width="16" height="234" fill="#3a3a3a"/>
+        <rect x="680" y="56" width="16" height="234" fill="#3a3a3a"/>
+        <g id="beams">
+          <polygon points="230,80 150,290 290,290" fill="url(#beam)"/>
+          <polygon points="400,80 330,290 470,290" fill="url(#beam)"/>
+          <polygon points="570,80 510,290 650,290" fill="url(#beam)"/>
+        </g>
+        <g fill="#ffffff" stroke="#555555" stroke-width="1.5">
+          <circle cx="230" cy="82" r="7"/><circle cx="400" cy="82" r="7"/><circle cx="570" cy="82" r="7"/>
+        </g>
+        <rect x="134" y="180" width="54" height="110" fill="#2e2e2e"/>
+        <circle class="cone" data-r0="13" cx="161" cy="210" r="13" fill="#555555"/>
+        <circle class="cone" data-r0="19" cx="161" cy="256" r="19" fill="#555555"/>
+        <rect x="612" y="180" width="54" height="110" fill="#2e2e2e"/>
+        <circle class="cone" data-r0="13" cx="639" cy="210" r="13" fill="#555555"/>
+        <circle class="cone" data-r0="19" cx="639" cy="256" r="19" fill="#555555"/>
+        <!-- Performer -->
+        <g id="performer">
+          <line x1="372" y1="290" x2="372" y2="178" stroke="#2b2b2b" stroke-width="3"/>
+          <line x1="372" y1="178" x2="388" y2="172" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
+          <g id="pBody">
+            <circle cx="400" cy="160" r="17" fill="#2b2b2b"/>
+            <path id="smile" d="M391,163 Q400,172 409,163" fill="none" stroke="#bdbdbd" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
+            <rect x="386" y="178" width="28" height="70" rx="10" fill="#2b2b2b"/>
+            <line id="armUp" x1="412" y1="190" x2="440" y2="150" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+            <!-- thumbs up, toward the viewer -->
+            <g id="thumb" opacity="0">
+              <line x1="412" y1="190" x2="444" y2="176" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+              <rect x="440" y="168" width="15" height="15" rx="5" fill="#2b2b2b"/>
+              <rect x="443" y="154" width="7" height="17" rx="3.5" fill="#2b2b2b"/>
+            </g>
+            <ellipse cx="404" cy="226" rx="20" ry="14" fill="#555555" transform="rotate(-25 404 226)"/>
+            <line x1="414" y1="220" x2="452" y2="196" stroke="#555555" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <rect x="388" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+          <rect x="402" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+        </g>
+        <rect x="96" y="320" width="608" height="140" fill="#3a3a3a"/>
+        <rect x="96" y="290" width="608" height="34" fill="#4a4a4a"/>
+        <line x1="96" y1="290" x2="704" y2="290" stroke="#3a3a3a" stroke-width="3"/>
+      </g>
+
+      <!-- Ground + barrier (r 1.6) -->
+      <g class="layer" data-r="1.6" data-k="1.6">
+        <rect x="-4000" y="340" width="8800" height="5000" fill="#7a7a7a"/>
+        <rect x="-4000" y="324" width="8800" height="16" fill="#9a9a9a"/>
+        <g stroke="#8a8a8a" stroke-width="3">
+          <line x1="-200" y1="324" x2="-200" y2="340"/><line x1="-80" y1="324" x2="-80" y2="340"/>
+          <line x1="40" y1="324" x2="40" y2="340"/><line x1="160" y1="324" x2="160" y2="340"/>
+          <line x1="280" y1="324" x2="280" y2="340"/><line x1="400" y1="324" x2="400" y2="340"/>
+          <line x1="520" y1="324" x2="520" y2="340"/><line x1="640" y1="324" x2="640" y2="340"/>
+          <line x1="760" y1="324" x2="760" y2="340"/><line x1="880" y1="324" x2="880" y2="340"/>
+          <line x1="1000" y1="324" x2="1000" y2="340"/>
+        </g>
+      </g>
+
+      <!-- Front row at the barrier (r 1.5) -->
+      <g class="layer crowd" data-r="1.5" data-k="1.5">
+        <g fill="#8c8c8c">
+          <circle cx="30" cy="322" r="13"/><rect x="12" y="335" width="36" height="60" rx="13"/>
+          <circle cx="110" cy="320" r="13"/><rect x="92" y="333" width="36" height="60" rx="13"/>
+          <circle cx="190" cy="323" r="13"/><rect x="172" y="336" width="36" height="60" rx="13"/>
+          <circle cx="270" cy="321" r="13"/><rect x="252" y="334" width="36" height="60" rx="13"/>
+          <circle cx="350" cy="322" r="13"/><rect x="332" y="335" width="36" height="60" rx="13"/>
+          <circle cx="450" cy="320" r="13"/><rect x="432" y="333" width="36" height="60" rx="13"/>
+          <circle cx="530" cy="323" r="13"/><rect x="512" y="336" width="36" height="60" rx="13"/>
+          <circle cx="610" cy="321" r="13"/><rect x="592" y="334" width="36" height="60" rx="13"/>
+          <circle cx="690" cy="322" r="13"/><rect x="672" y="335" width="36" height="60" rx="13"/>
+          <circle cx="770" cy="320" r="13"/><rect x="752" y="333" width="36" height="60" rx="13"/>
+        </g>
+        <g stroke="#8c8c8c" stroke-width="7" stroke-linecap="round">
+          <line x1="120" y1="342" x2="132" y2="290"/><line x1="100" y1="342" x2="88" y2="290"/>
+          <line x1="280" y1="342" x2="292" y2="292"/>
+          <line x1="460" y1="342" x2="472" y2="290"/><line x1="440" y1="342" x2="428" y2="290"/>
+          <line x1="700" y1="342" x2="712" y2="292"/>
+        </g>
+      </g>
+
+      <!-- Middle row (r 1.0) -->
+      <g class="layer crowd" data-r="1" data-k="1">
+        <g fill="#5e5e5e">
+          <circle cx="70" cy="362" r="19"/><rect x="44" y="381" width="52" height="120" rx="19"/>
+          <circle cx="200" cy="358" r="19"/><rect x="174" y="377" width="52" height="120" rx="19"/>
+          <circle cx="600" cy="358" r="19"/><rect x="574" y="377" width="52" height="120" rx="19"/>
+          <circle cx="730" cy="362" r="19"/><rect x="704" y="381" width="52" height="120" rx="19"/>
+        </g>
+        <g stroke="#5e5e5e" stroke-width="10" stroke-linecap="round">
+          <line x1="215" y1="390" x2="238" y2="320"/>
+          <line x1="585" y1="390" x2="562" y2="320"/>
+          <line x1="745" y1="394" x2="768" y2="324"/>
+        </g>
+      </g>
+
+      <!-- Nearest heads (r 0.6) -->
+      <g class="layer crowd" data-r="0.6" data-k="0.6">
+        <g fill="#3a3a3a">
+          <circle cx="-4" cy="420" r="38"/><rect x="-52" y="456" width="96" height="80" rx="38"/>
+          <circle cx="804" cy="420" r="38"/><rect x="756" y="456" width="96" height="80" rx="38"/>
+        </g>
+      </g>
+
+      <!-- Two rows that stand between the viewer and the barrier at the start,
+           built from the same crowd figures, leaving a man-sized gap in the middle -->
+      <g class="layer crowd" data-r="-0.6" data-k="1.6">
+        <g fill="#4a4a4a">
+          <circle cx="60" cy="312" r="28"/><rect x="24" y="340" width="72" height="200" rx="28"/>
+          <circle cx="166" cy="318" r="28"/><rect x="130" y="346" width="72" height="200" rx="28"/>
+          <circle cx="272" cy="314" r="28"/><rect x="236" y="342" width="72" height="200" rx="28"/>
+          <circle cx="528" cy="314" r="28"/><rect x="492" y="342" width="72" height="200" rx="28"/>
+          <circle cx="634" cy="318" r="28"/><rect x="598" y="346" width="72" height="200" rx="28"/>
+          <circle cx="740" cy="312" r="28"/><rect x="704" y="340" width="72" height="200" rx="28"/>
+        </g>
+        <g stroke="#4a4a4a" stroke-width="14" stroke-linecap="round">
+          <line x1="190" y1="370" x2="214" y2="276"/><line x1="610" y1="370" x2="586" y2="276"/>
+        </g>
+      </g>
+      <g class="layer crowd" data-r="-1.4" data-k="0.8">
+        <g fill="#2e2e2e">
+          <circle cx="30" cy="300" r="46"/><rect x="-30" y="346" width="120" height="280" rx="46"/>
+          <circle cx="150" cy="306" r="46"/><rect x="90" y="352" width="120" height="280" rx="46"/>
+          <circle cx="262" cy="320" r="46"/><rect x="202" y="366" width="120" height="280" rx="46"/>
+          <circle cx="538" cy="320" r="46"/><rect x="478" y="366" width="120" height="280" rx="46"/>
+          <circle cx="650" cy="306" r="46"/><rect x="590" y="352" width="120" height="280" rx="46"/>
+          <circle cx="770" cy="300" r="46"/><rect x="710" y="346" width="120" height="280" rx="46"/>
+        </g>
+        <g stroke="#2e2e2e" stroke-width="22" stroke-linecap="round">
+          <line x1="128" y1="390" x2="96" y2="236"/><line x1="680" y1="388" x2="712" y2="240"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- The viewer's own hands -->
+    <g id="handL">
+      <g fill="#1f1f1f">
+        <path d="M190,500 L280,500 L340,372 L306,356 Z"/>
+        <ellipse cx="324" cy="352" rx="23" ry="27" transform="rotate(22 324 352)"/>
+        <rect x="303" y="308" width="11" height="40" rx="5.5" transform="rotate(22 308 328)"/>
+        <rect x="316" y="304" width="11" height="44" rx="5.5" transform="rotate(22 321 326)"/>
+        <rect x="329" y="308" width="11" height="40" rx="5.5" transform="rotate(22 334 328)"/>
+        <rect x="341" y="316" width="10" height="34" rx="5" transform="rotate(22 346 333)"/>
+        <rect x="337" y="346" width="10" height="28" rx="5" transform="rotate(68 342 360)"/>
+      </g>
+      <path d="M200,500 L274,500 L290,462 L228,446 Z" fill="#4a4a4a"/>
+    </g>
+    <g id="handR">
+      <g fill="#1f1f1f">
+        <path d="M610,500 L520,500 L460,372 L494,356 Z"/>
+        <ellipse cx="476" cy="352" rx="23" ry="27" transform="rotate(-22 476 352)"/>
+        <rect x="486" y="308" width="11" height="40" rx="5.5" transform="rotate(-22 492 328)"/>
+        <rect x="473" y="304" width="11" height="44" rx="5.5" transform="rotate(-22 479 326)"/>
+        <rect x="460" y="308" width="11" height="40" rx="5.5" transform="rotate(-22 466 328)"/>
+        <rect x="449" y="316" width="10" height="34" rx="5" transform="rotate(-22 454 333)"/>
+        <rect x="453" y="346" width="10" height="28" rx="5" transform="rotate(-68 458 360)"/>
+      </g>
+      <path d="M600,500 L526,500 L510,462 L572,446 Z" fill="#4a4a4a"/>
+    </g>
+  </svg>
+
+  <div class="hint" id="hint" aria-hidden="true">
+    <div class="trail"></div>
+    <svg class="hand" viewBox="0 0 32 32">
+      <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="#ffffff" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+(() => {
+  const frame = document.getElementById('frame');
+  const hint = document.getElementById('hint');
+  const world = document.getElementById('world');
+  const handL = document.getElementById('handL'), handR = document.getElementById('handR');
+  const smile = document.getElementById('smile'), thumb = document.getElementById('thumb');
+  const armUp = document.getElementById('armUp'), pBody = document.getElementById('pBody');
+  const cones = [...document.querySelectorAll('.cone')];
+  const beams = document.getElementById('beams');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const layers = [...document.querySelectorAll('.layer')].map((el, i) => ({
+    el, r: +el.dataset.r, k: +el.dataset.k, crowd: el.classList.contains('crowd'), phase: i * 1.7
+  }));
+
+  // Camera path: START units behind the reference view, END units past it (at the barrier).
+  const START = 2.2, END = 1.36, VX = 400, VY = 300;
+  const BPM = 124, BEAT = 60 / BPM;
+
+  let st;
+  function fresh() {
+    return { phase: 'fight', p: 0, v: 0, holding: false, lastY: 0, idle: 0, started: false,
+             pressure: 0.3, shoveIn: 1.2, reach: { s: 0, v: 0 }, knock: 0,
+             jolt: { x: 0, vx: 0, r: 0, vr: 0 }, doneT: 0 };
+  }
+
+  // ---------- Sound: a simple synthesized track that gets closer and louder ----------
+  let ac = null, master, lp;
+  function startAudio() {
+    if (ac) { ac.resume?.(); return; }
+    try {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { ac = null; return; }
+    lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380; lp.Q.value = 0.7;
+    master = ac.createGain(); master.gain.value = 0.12;
+    lp.connect(master); master.connect(ac.destination);
+    const noise = ac.createBuffer(1, ac.sampleRate * 0.2, ac.sampleRate);
+    const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const bassNotes = [41.2, 41.2, 49, 36.7];      // E1 E1 G1 D1
+    let next = ac.currentTime + 0.05, step = 0;
+    const kick = t => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.16);
+      g.gain.setValueAtTime(1.0, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+      o.connect(g); g.connect(lp); o.start(t); o.stop(t + 0.4);
+    };
+    const hat = t => {
+      const s = ac.createBufferSource(); s.buffer = noise;
+      const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 7000;
+      const g = ac.createGain(); g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      s.connect(f); f.connect(g); g.connect(lp); s.start(t); s.stop(t + 0.06);
+    };
+    const bass = (t, hz) => {
+      const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+      o.type = 'sawtooth'; o.frequency.value = hz * 2;
+      f.type = 'lowpass'; f.frequency.value = 520;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + BEAT * 0.9);
+      o.connect(f); f.connect(g); g.connect(lp); o.start(t); o.stop(t + BEAT);
+    };
+    setInterval(() => {
+      while (next < ac.currentTime + 0.25) {
+        kick(next);
+        hat(next + BEAT / 2);
+        bass(next + BEAT / 2, bassNotes[Math.floor(step / 4) % 4]);
+        next += BEAT; step++;
+      }
+    }, 60);
+  }
+  function setLoudness(p) {
+    if (!ac) return;
+    const t = ac.currentTime;
+    lp.frequency.setTargetAtTime(380 + Math.pow(p, 1.4) * 7000, t, 0.08);
+    master.gain.setTargetAtTime(0.12 + p * 0.38, t, 0.08);
+  }
+  const clock = () => ac ? ac.currentTime - 0.05 : performance.now() / 1000;
+
+  // ---------- Input: press and drag forward (up), stroke after stroke ----------
+  const toView = d => d / frame.getBoundingClientRect().height * 500;
+  const GAIN = 0.0014;          // forward speed gained per viewBox unit of upward drag
+  frame.addEventListener('pointerdown', e => {
+    startAudio();
+    if (st.phase !== 'fight') return;
+    st.holding = true; st.lastY = e.clientY;
+    frame.classList.add('holding'); frame.setPointerCapture?.(e.pointerId);
+  });
+  frame.addEventListener('pointermove', e => {
+    if (!st.holding || st.phase !== 'fight') return;
+    const dy = toView(st.lastY - e.clientY); st.lastY = e.clientY;
+    if (dy <= 0) return;                         // pulling back down just resets your hands
+    st.started = true; st.idle = 0; hint.classList.remove('in');
+    st.v += dy * GAIN;
+    st.reach.v += dy * 0.09;
+    st.pressure = Math.max(0, st.pressure - dy * 0.0025);   // you pry the gap open
+  });
+  const release = () => {
+    if (!st.holding) return;
+    st.holding = false; frame.classList.remove('holding');
+  };
+  frame.addEventListener('pointerup', release);
+  frame.addEventListener('pointercancel', release);
+  frame.addEventListener('contextmenu', e => e.preventDefault());
+
+  // the crowd shoves back: a knock that costs you ground and rocks the camera
+  function shove() {
+    const hard = 0.06 + Math.random() * 0.07 + st.p * 0.05;
+    st.v -= hard;
+    const dir = Math.random() < 0.5 ? -1 : 1;
+    st.jolt.vx += dir * (90 + Math.random() * 80);
+    st.jolt.vr += -dir * (14 + Math.random() * 10);
+    st.pressure = Math.min(1, st.pressure + 0.45);
+    st.knock = 1;
+  }
+
+  // ---------- Loop ----------
+  let last = performance.now();
+  function step(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now;
+    const t = clock();
+    const beat = Math.exp(-((t % BEAT) / BEAT) * 7);         // 1 on the kick, decaying
+
+    if (st.phase === 'fight') {
+      // slippery: very little friction, a steady push back from the crowd
+      if (st.p > 0) st.v -= (0.075 + 0.03 * st.p) * dt;
+      st.v *= Math.exp(-0.85 * dt);
+      st.v = Math.max(st.v, -0.22);            // you slide back, but never faster than this
+      st.p += st.v * dt;
+      if (st.p < 0) { st.p = 0; st.v = Math.max(0, st.v) * 0.3; }
+      if (st.started) {
+        st.shoveIn -= dt;
+        if (st.shoveIn <= 0 && st.p > 0.03) { shove(); st.shoveIn = 0.55 + Math.random() * 0.9; }
+      }
+      st.pressure += (0.3 - st.pressure) * 0.6 * dt;
+      if (!st.holding) st.idle += dt;
+      if (st.idle > 2.2 && st.p < 0.6) hint.classList.add('in');
+      if (st.p >= 0.985) { st.phase = 'arrived'; st.doneT = 0; st.v = Math.min(st.v, 0.4); hint.classList.remove('in'); }
+    } else if (st.phase === 'arrived') {
+      st.doneT += dt;
+      // slide the last bit and settle against the barrier
+      st.v += ((1 - st.p) * 60 - st.v * 6) * dt;
+      st.p += st.v * dt;
+      st.pressure += (0 - st.pressure) * 2 * dt;
+    }
+    const pc = Math.max(0, Math.min(1, st.p));
+    frame.dataset.p = pc.toFixed(2);
+    setLoudness(pc);
+
+    // camera jolts spring back to centre
+    const J = st.jolt;
+    J.vx += (-J.x * 70 - J.vx * 7) * dt; J.x += J.vx * dt;
+    J.vr += (-J.r * 70 - J.vr * 7) * dt; J.r += J.vr * dt;
+    st.knock *= Math.exp(-5 * dt);
+    const jostle = reduce || st.phase !== 'fight' ? 0 : st.pressure * 1.6;
+    const roll = reduce ? 0 : J.r + Math.sin(t * 7.3) * jostle * 0.5;
+    const slip = reduce ? 0 : J.x + Math.sin(t * 5.1) * jostle * 4;
+    const pulse = reduce ? 0 : beat * 0.006 * (0.3 + pc);
+    const left = START - pc * (START + END);
+    world.setAttribute('transform', `translate(${(VX + slip).toFixed(2)} ${VY}) rotate(${roll.toFixed(2)}) scale(${(1 + pulse).toFixed(4)}) translate(${-VX} ${-VY})`);
+
+    for (const L of layers) {
+      const dist = L.r + left;
+      if (dist <= 0.17) { L.el.setAttribute('opacity', 0); continue; }
+      const s = L.k / dist;
+      L.el.setAttribute('opacity', dist < 0.4 ? ((dist - 0.17) / 0.23).toFixed(3) : 1);
+      let sway = 0, bob = 0, squeeze = 1;
+      if (L.crowd && !reduce) {
+        sway = Math.sin(t * Math.PI / BEAT + L.phase) * 0.9;
+        bob = beat * 3 * Math.min(1, s);
+        // the nearest rows crowd in on the gap when they push back
+        if (dist < 1.8) squeeze = 1 - st.pressure * 0.13 * (1.8 - dist) / 1.8 * 2;
+      }
+      L.el.setAttribute('transform',
+        `translate(${VX} ${VY + bob}) scale(${(s * squeeze).toFixed(4)} ${s.toFixed(4)}) rotate(${sway.toFixed(2)}) translate(${-VX} ${-VY})`);
+    }
+
+    // speakers thump, lights breathe
+    const boom = beat * (0.25 + st.p);
+    for (const c of cones) c.setAttribute('r', (+c.dataset.r0 * (1 + boom * 0.18)).toFixed(2));
+    beams.setAttribute('opacity', (0.75 + beat * 0.25).toFixed(3));
+
+    // your hands claw forward on each stroke, and get knocked back on each shove
+    const R = st.reach;
+    R.v += (-R.s * 55 - R.v * 6) * dt; R.s += R.v * dt;
+    const reach = Math.max(-0.4, Math.min(1.4, R.s));
+    let hx = 0, hy = 0, hr = 0;
+    if (!reduce) {
+      hx = Math.max(0, reach) * 60 - st.knock * 16;
+      hy = -reach * 70 + st.knock * 40;
+      hr = Math.max(0, reach) * 12;
+    }
+    handL.setAttribute('transform', `translate(${-hx} ${hy}) rotate(${-hr} 235 500)`);
+    handR.setAttribute('transform', `translate(${hx} ${hy}) rotate(${hr} 565 500)`);
+
+    // the performer notices you
+    if (st.phase === 'arrived') {
+      const k = Math.min(1, Math.max(0, (st.doneT - 0.25) / 0.25));
+      smile.setAttribute('opacity', k.toFixed(2));
+      const th = Math.min(1, Math.max(0, (st.doneT - 0.45) / 0.18));
+      thumb.setAttribute('opacity', th.toFixed(2)); armUp.setAttribute('opacity', (1 - th).toFixed(2));
+      const pop = th > 0 && th < 1 ? Math.sin(th * Math.PI) * 4 : 0;
+      pBody.setAttribute('transform', `translate(0 ${(-pop - beat * 2).toFixed(2)})`);
+    } else {
+      pBody.setAttribute('transform', `translate(0 ${(-beat * 1.5).toFixed(2)})`);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  let hintTimer;
+  function reset() {
+    st = fresh();
+    smile.setAttribute('opacity', 0); thumb.setAttribute('opacity', 0); armUp.setAttribute('opacity', 1);
+    hint.classList.remove('in'); clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => { if (st.phase === 'fight' && !st.started) hint.classList.add('in'); }, 700);
+  }
+  document.getElementById('reset').addEventListener('click', reset);
+
+  reset();
+  requestAnimationFrame(step);
+})();
+</script>
+
+</body></html>

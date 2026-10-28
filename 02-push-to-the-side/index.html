@@ -1,0 +1,464 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Push to the Side</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one letterboxed scene frame centered on a quiet page; two push meters float at the frame's left and right edges. */
+:root {
+  --page: #e6e6e4;
+  --ink: #2b2b2b;
+  --muted: #6e6e6c;
+  --frame-edge: #c9c9c6;
+  --pill: rgba(255,255,255,0.84);
+  --pill-edge: rgba(43,43,43,0.18);
+  --bar-fill: #2b2b2b;
+  --font-ui: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+    --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); --bar-fill: #e8e8e6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+  --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); --bar-fill: #e8e8e6; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--ink); font-family: var(--font-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overflow: hidden;
+}
+.top {
+  width: min(100%, calc((100vh - 104px) * 1.6));
+  display: flex; justify-content: flex-end; align-items: center; gap: 12px;
+}
+.reset {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid var(--pill-edge); background: var(--pill); color: var(--ink); cursor: pointer; padding: 0;
+}
+.reset:hover { background: var(--page); }
+.reset:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reset svg { width: 16px; height: 16px; }
+.frame {
+  position: relative; width: min(100%, calc((100vh - 104px) * 1.6));
+  aspect-ratio: 8 / 5; max-width: 100%;
+  overflow: hidden; border-radius: 6px; outline: 1px solid var(--frame-edge);
+  background: #dedede; cursor: grab; touch-action: none; contain: paint;
+}
+.frame.holding { cursor: grabbing; }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Push meters: hand + charge bar on each side */
+.meter {
+  position: absolute; top: 46%;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 14px;
+  background: var(--pill); border: 1px solid var(--pill-edge);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity 420ms ease, transform 520ms cubic-bezier(.2,1.4,.4,1);
+  pointer-events: none;
+}
+.meter.left { left: 3%; transform: translate(-10px, -50%); }
+.meter.right { right: 3%; transform: translate(10px, -50%); }
+.meter.in { opacity: 1; transform: translate(0, -50%); }
+.meter.out { opacity: 0; transition-duration: 260ms; }
+.meter.wait { opacity: 0.35; scale: 0.9; }
+.meter.wait .hand { animation: none; }
+.meter.full { animation: thump 380ms cubic-bezier(.2,1.8,.4,1); }
+@keyframes thump { 0% { scale: 0.9; } 100% { scale: 1; } }
+.hand { width: 30px; height: 30px; color: var(--ink); }
+.meter.left .hand { animation: swipeL 1.4s ease-in-out infinite; }
+.meter.right .hand { animation: swipeR 1.4s ease-in-out infinite; }
+@keyframes swipeL { 0%, 15% { transform: translateX(10px); opacity: 1; } 60% { transform: translateX(-10px); opacity: 1; } 80% { transform: translateX(-10px); opacity: 0.25; } 100% { transform: translateX(10px); opacity: 1; } }
+@keyframes swipeR { 0%, 15% { transform: translateX(-10px) scaleX(-1); opacity: 1; } 60% { transform: translateX(10px) scaleX(-1); opacity: 1; } 80% { transform: translateX(10px) scaleX(-1); opacity: 0.25; } 100% { transform: translateX(-10px) scaleX(-1); opacity: 1; } }
+.meter.active .hand { animation: none; opacity: 1; }
+.meter.right.active .hand { transform: scaleX(-1); }
+.bar {
+  position: relative; width: clamp(64px, 11vw, 120px); height: 12px;
+  border: 2px solid var(--ink); border-radius: 3px; box-sizing: border-box; overflow: hidden;
+}
+.bar .fill { position: absolute; top: 0; bottom: 0; width: 0%; background: var(--bar-fill); }
+.meter.left .fill { right: 0; }
+.meter.right .fill { left: 0; }
+.bar .ticks {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(12.5% - 1px), var(--pill) calc(12.5% - 1px) 12.5%);
+}
+@media (max-width: 480px) { .meter { padding: 6px 8px; gap: 5px; } .hand { width: 22px; height: 22px; } }
+@media (prefers-reduced-motion: reduce) { .meter .hand { animation: none !important; } }
+</style>
+
+<div class="top">
+  <button class="reset" id="reset" type="button" aria-label="Reset">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2.5 2v3.5H6"/>
+    </svg>
+  </button>
+</div>
+
+<div class="frame" id="frame" aria-label="View from the back of a festival crowd. Hold and swipe left and right to push people aside.">
+  <svg class="scene" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#cfcfcf"/><stop offset="1" stop-color="#ededed"/>
+      </linearGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g id="cam">
+      <rect x="-200" y="-200" width="1200" height="900" fill="url(#sky)"/>
+      <!-- Stage -->
+      <rect x="270" y="150" width="260" height="110" fill="#8a8a8a"/>
+      <polygon points="250,150 550,150 528,118 272,118" fill="#3a3a3a"/>
+      <line x1="285" y1="134" x2="515" y2="134" stroke="#7a7a7a" stroke-width="1.5"/>
+      <rect x="260" y="122" width="10" height="138" fill="#3a3a3a"/>
+      <rect x="530" y="122" width="10" height="138" fill="#3a3a3a"/>
+      <polygon points="300,138 240,260 330,260" fill="url(#beam)"/>
+      <polygon points="400,138 360,260 440,260" fill="url(#beam)"/>
+      <polygon points="500,138 470,260 560,260" fill="url(#beam)"/>
+      <g fill="#ffffff" stroke="#555555" stroke-width="1">
+        <circle cx="300" cy="140" r="5"/><circle cx="400" cy="140" r="5"/><circle cx="500" cy="140" r="5"/>
+      </g>
+      <rect x="226" y="200" width="30" height="60" fill="#2e2e2e"/>
+      <circle cx="241" cy="217" r="7" fill="#555555"/><circle cx="241" cy="242" r="10" fill="#555555"/>
+      <rect x="544" y="200" width="30" height="60" fill="#2e2e2e"/>
+      <circle cx="559" cy="217" r="7" fill="#555555"/><circle cx="559" cy="242" r="10" fill="#555555"/>
+      <circle cx="400" cy="206" r="9" fill="#2b2b2b"/>
+      <rect x="393" y="215" width="14" height="40" rx="5" fill="#2b2b2b"/>
+      <line x1="407" y1="222" x2="422" y2="202" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+      <!-- Ground -->
+      <rect x="-200" y="260" width="1200" height="440" fill="#7a7a7a"/>
+      <!-- Crowd is built in script so each person can be shoved -->
+      <g id="crowd"></g>
+    </g>
+    <!-- The viewer's own arms -->
+    <g id="armL">
+      <g fill="#1f1f1f">
+        <path d="M150,500 L250,500 L320,330 L285,312 Z"/>
+        <ellipse cx="305" cy="312" rx="24" ry="28" transform="rotate(25 305 312)"/>
+        <rect x="283" y="268" width="11" height="40" rx="5.5" transform="rotate(25 288 288)"/>
+        <rect x="296" y="264" width="11" height="44" rx="5.5" transform="rotate(25 301 286)"/>
+        <rect x="309" y="268" width="11" height="40" rx="5.5" transform="rotate(25 314 288)"/>
+        <rect x="321" y="276" width="10" height="34" rx="5" transform="rotate(25 326 293)"/>
+        <rect x="318" y="306" width="10" height="28" rx="5" transform="rotate(70 323 320)"/>
+      </g>
+      <path d="M165,500 L245,500 L262,455 L196,438 Z" fill="#4a4a4a"/>
+    </g>
+    <g id="armR">
+      <g fill="#1f1f1f">
+        <path d="M650,500 L550,500 L480,330 L515,312 Z"/>
+        <ellipse cx="495" cy="312" rx="24" ry="28" transform="rotate(-25 495 312)"/>
+        <rect x="506" y="268" width="11" height="40" rx="5.5" transform="rotate(-25 512 288)"/>
+        <rect x="493" y="264" width="11" height="44" rx="5.5" transform="rotate(-25 499 286)"/>
+        <rect x="480" y="268" width="11" height="40" rx="5.5" transform="rotate(-25 486 288)"/>
+        <rect x="469" y="276" width="10" height="34" rx="5" transform="rotate(-25 474 293)"/>
+        <rect x="472" y="306" width="10" height="28" rx="5" transform="rotate(-70 477 320)"/>
+      </g>
+      <path d="M635,500 L555,500 L538,455 L604,438 Z" fill="#4a4a4a"/>
+    </g>
+  </svg>
+
+  <div class="meter left" id="meterL" aria-hidden="true">
+    <svg class="hand" viewBox="0 0 32 32">
+      <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+    <div class="bar"><div class="fill" id="fillL"></div><div class="ticks"></div></div>
+  </div>
+  <div class="meter right" id="meterR" aria-hidden="true">
+    <svg class="hand" viewBox="0 0 32 32">
+      <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+    <div class="bar"><div class="fill" id="fillR"></div><div class="ticks"></div></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const frame = document.getElementById('frame');
+  const crowdG = document.getElementById('crowd');
+  const cam = document.getElementById('cam');
+  const armEls = { '-1': document.getElementById('armL'), '1': document.getElementById('armR') };
+  const meters = { '-1': document.getElementById('meterL'), '1': document.getElementById('meterR') };
+  const fills = { '-1': document.getElementById('fillL'), '1': document.getElementById('fillR') };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Crowd, taken from the festival-crowd SVG ----------
+  // Each person: head (cx, cy, r), body below it, optional raised arms, a row weight w,
+  // and F = how far the full shove carries them (viewBox units).
+  const people = [];
+  function person({ x, y, r, bw, bh, color, arms = [], sw = 4, s = 1, w, F }) {
+    const outer = document.createElementNS(NS, 'g');
+    const inner = document.createElementNS(NS, 'g');
+    inner.setAttribute('transform', `translate(${x} ${y}) scale(${s})`);
+    inner.setAttribute('fill', color);
+    const head = document.createElementNS(NS, 'circle');
+    head.setAttribute('cx', 0); head.setAttribute('cy', 0); head.setAttribute('r', r);
+    const body = document.createElementNS(NS, 'rect');
+    body.setAttribute('x', -bw / 2); body.setAttribute('y', r);
+    body.setAttribute('width', bw); body.setAttribute('height', bh); body.setAttribute('rx', r);
+    inner.append(head, body);
+    for (const [x1, y1, x2, y2] of arms) {
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', x1 - x); l.setAttribute('y1', y1 - y);
+      l.setAttribute('x2', x2 - x); l.setAttribute('y2', y2 - y);
+      l.setAttribute('stroke', color); l.setAttribute('stroke-width', sw); l.setAttribute('stroke-linecap', 'round');
+      inner.appendChild(l);
+    }
+    outer.appendChild(inner); crowdG.appendChild(outer);
+    const side = x < 400 ? -1 : 1;
+    people.push({ el: outer, x, footY: y + (r + bh) * s, side, w, F: side * F, phase: Math.random() * Math.PI * 2 });
+  }
+
+  // far row
+  const farArms = { 130: [[135,282,142,252]], 330: [[335,282,342,252]], 430: [[425,282,418,252]], 580: [[585,282,592,252]], 730: [[735,282,742,252]] };
+  [[30,268],[80,266],[130,269],[180,267],[230,268],[280,266],[330,269],[380,267],[430,268],[480,266],[530,269],[580,267],[630,268],[680,266],[730,269],[780,267]]
+    .forEach(([x, y]) => person({ x, y, r: 8, bw: 20, bh: 30, color: '#9a9a9a', arms: farArms[x], sw: 4, w: 0.15, F: 26 }));
+  // middle row
+  const midArms = { 140: [[150,308,162,262],[130,308,118,262]], 490: [[500,308,512,262]], 660: [[670,308,682,262],[650,308,638,262]] };
+  [[55,290],[140,288],[225,291],[310,289],[490,289],[575,291],[660,288],[745,290]]
+    .forEach(([x, y]) => person({ x, y, r: 12, bw: 30, bh: 50, color: '#666666', arms: midArms[x], sw: 7, w: 0.55, F: 240 }));
+  // near row
+  person({ x: 20, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
+  person({ x: 175, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[195,366,222,290]], sw: 12, w: 0.75, F: 280 });
+  person({ x: 625, y: 326, r: 22, bw: 56, bh: 160, color: '#3a3a3a', arms: [[605,366,578,290]], sw: 12, w: 0.75, F: 280 });
+  person({ x: 780, y: 330, r: 22, bw: 56, bh: 160, color: '#3a3a3a', w: 0.75, F: 200 });
+  // the people right in front of the viewer: near-row figures, closer, blocking the stage
+  const near = { r: 22, bw: 56, bh: 160 };
+  person({ ...near, x: 368, y: 222, s: 1.6, color: '#4c4c4c', w: 0.9, F: 470 });
+  person({ ...near, x: 438, y: 220, s: 1.6, color: '#4c4c4c', arms: [[458,260,485,184]], sw: 12, w: 0.9, F: 470 });
+  person({ ...near, x: 316, y: 206, s: 2.3, color: '#333333', w: 1, F: 470 });
+  person({ ...near, x: 494, y: 204, s: 2.3, color: '#333333', w: 1, F: 470 });
+
+  // ---------- Music: a synthesized kick, bass and hats, heard through a low-pass "distance" filter ----------
+  const music = (() => {
+    const BEAT = 60 / 124;
+    let ac = null, lp, master;
+    function start() {
+      if (ac) { ac.resume?.(); return; }
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; return; }
+      lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 200; lp.Q.value = 0.7;
+      master = ac.createGain(); master.gain.value = 0;
+      lp.connect(master); master.connect(ac.destination);
+      const noise = ac.createBuffer(1, ac.sampleRate * 0.2, ac.sampleRate);
+      const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const notes = [41.2, 41.2, 49, 36.7];
+      let next = ac.currentTime + 0.05, n = 0;
+      const kick = t => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.16);
+        g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        o.connect(g); g.connect(lp); o.start(t); o.stop(t + 0.4);
+      };
+      const hat = t => {
+        const s = ac.createBufferSource(); s.buffer = noise;
+        const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 7000;
+        const g = ac.createGain(); g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+        s.connect(f); f.connect(g); g.connect(lp); s.start(t); s.stop(t + 0.06);
+      };
+      const bass = (t, hz) => {
+        const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+        o.type = 'sawtooth'; o.frequency.value = hz * 2; f.type = 'lowpass'; f.frequency.value = 520;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + BEAT * 0.9);
+        o.connect(f); f.connect(g); g.connect(lp); o.start(t); o.stop(t + BEAT);
+      };
+      setInterval(() => {
+        while (next < ac.currentTime + 0.25) {
+          kick(next); hat(next + BEAT / 2); bass(next + BEAT / 2, notes[Math.floor(n / 4) % 4]);
+          next += BEAT; n++;
+        }
+      }, 60);
+    }
+    // gain 0..1, cutoff in Hz (low = far away and muffled), tc = smoothing time
+    function set(gain, cutoff, tc = 0.15) {
+      if (!ac) return;
+      master.gain.setTargetAtTime(gain, ac.currentTime, tc);
+      lp.frequency.setTargetAtTime(cutoff, ac.currentTime, tc);
+    }
+    // 1 on each kick, decaying to 0 before the next
+    function beat() {
+      const t = ac ? ac.currentTime - 0.05 : performance.now() / 1000;
+      return Math.exp(-((((t % BEAT) + BEAT) % BEAT) / BEAT) * 7);
+    }
+    return { start, set, beat, BEAT };
+  })();
+
+  // ---------- State ----------
+  const SWIPE = 260;           // viewBox units of sideways drag needed to fill one bar
+  const DECAY = 0.12;          // bar leak per second while held but not swiping
+  const PARTIAL = 0.3;         // share of the full shove reached while charging
+  const TICKS = 8;
+  const SHOVED = 0.72;         // how far a side is shoved while it waits for the other side
+  const WINDOW = 3.2;          // seconds a shoved side stays clear: time to swipe the other way, plus spare
+  const sides = [-1, 1];
+  let st;
+  function fresh() {
+    return {
+      phase: 'armed', holding: false, lastX: 0, t: 0,
+      fill: { '-1': 0, '1': 0 }, window: { '-1': 0, '1': 0 }, locked: { '-1': false, '1': false }, tick: { '-1': 0, '1': 0 },
+      push: { '-1': { s: 0, v: 0, target: 0 }, '1': { s: 0, v: 0, target: 0 } },
+      arm: { '-1': { s: 0, v: 0 }, '1': { s: 0, v: 0 } },
+      hop: { '-1': 0, '1': 0 }, shake: 0, zoom: { s: 0, v: 0, target: 0 }
+    };
+  }
+
+  function bump(side, power = 1) {
+    const m = Math.abs(power);
+    st.push[side].v += 0.55 * power;
+    st.arm[side].v += 6 * m;
+    st.hop[side] = Math.min(1.4, st.hop[side] + 0.8 * m);
+    st.shake = Math.min(1.5, st.shake + 0.45 * m);
+  }
+
+  // ---------- Input: hold and swipe ----------
+  const toView = dx => dx / frame.getBoundingClientRect().width * 800;
+  frame.addEventListener('pointerdown', e => {
+    music.start();
+    if (st.phase !== 'armed') return;
+    st.holding = true; st.lastX = e.clientX;
+    frame.classList.add('holding');
+    frame.setPointerCapture?.(e.pointerId);
+    showMeters();
+    sides.forEach(s => meters[s].classList.add('active'));
+  });
+  frame.addEventListener('pointermove', e => {
+    if (!st.holding || st.phase !== 'armed') return;
+    const dx = toView(e.clientX - st.lastX); st.lastX = e.clientX;
+    const side = dx < 0 ? -1 : 1;
+    if (st.locked[side] || dx === 0) return;
+    // one side at a time: the other side opens only after this one is shoved clear
+    if (activeSide() !== 0 && activeSide() !== side) return;
+    st.fill[side] = Math.min(1, st.fill[side] + Math.abs(dx) / SWIPE);
+    if (st.fill[side] >= 1) {
+      st.locked[side] = true; st.lastLocked = side; st.window[side] = WINDOW;
+      bump(side, 1.7);
+      meters[side].classList.remove('full'); void meters[side].offsetWidth; meters[side].classList.add('full');
+    }
+  });
+  const release = () => {
+    if (!st.holding) return;
+    st.holding = false; frame.classList.remove('holding');
+    sides.forEach(s => meters[s].classList.remove('active'));
+  };
+  frame.addEventListener('pointerup', release);
+  frame.addEventListener('pointercancel', release);
+  frame.addEventListener('contextmenu', e => e.preventDefault());
+
+  // The side currently being worked: a locked side hands over to the other; a side that has
+  // started filling holds the turn until it locks or drains away.
+  function activeSide() {
+    for (const s of sides) if (st.locked[s] && !st.locked[-s]) return -s;
+    for (const s of sides) if (st.fill[s] > 0 && !st.locked[s]) return s;
+    return 0;
+  }
+
+  // ---------- Signifiers ----------
+  let meterTimer;
+  function showMeters() { sides.forEach(s => meters[s].classList.add('in')); }
+  function hideMeters() { sides.forEach(s => meters[s].classList.add('out')); }
+
+  // ---------- Completion ----------
+  function complete() {
+    st.phase = 'shoving';
+    hideMeters();
+    // two hard shoves, a beat apart, then the crowd settles out of the way
+    const order = st.lastLocked === -1 ? [1, -1] : [-1, 1];
+    order.forEach((s, i) => setTimeout(() => { st.push[s].target = 1; bump(s, 1.6); }, i * 150));
+    setTimeout(() => { sides.forEach(s => bump(s, 0.9)); st.zoom.target = 1; }, 420);
+    setTimeout(() => { st.phase = 'done'; }, 1600);
+  }
+
+  // ---------- Loop ----------
+  function spring(o, target, k, c, dt) {
+    o.v += ((target - o.s) * k - o.v * c) * dt;
+    o.s += o.v * dt;
+  }
+  let last = performance.now();
+  function frameStep(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now; st.t += dt;
+
+    for (const s of sides) {
+      if (st.phase === 'armed' && st.locked[s]) {
+        // shoved aside for a moment; the full bar empties like a timer
+        st.window[s] -= dt;
+        st.fill[s] = Math.max(0, st.window[s] / WINDOW);
+        st.tick[s] = Math.floor(st.fill[s] * TICKS + 1e-6);
+        st.push[s].target = SHOVED;
+        if (st.window[s] <= 0) {             // too slow on the other side: they stumble back
+          st.locked[s] = false; st.fill[s] = 0; st.tick[s] = 0; st.push[s].target = 0;
+          bump(s, -0.9);
+        }
+      } else if (st.phase === 'armed') {
+        if (st.holding && !st.locked[s]) st.fill[s] = Math.max(0, st.fill[s] - DECAY * dt);
+        if (!st.holding) st.fill[s] = Math.max(0, st.fill[s] - 2.4 * dt);
+        // a bump each time the bar crosses a tick
+        const tk = Math.floor(st.fill[s] * TICKS + 1e-6);
+        if (st.holding && tk > st.tick[s]) bump(s, tk === TICKS ? 1.3 : 0.6);
+        st.tick[s] = tk;
+        st.push[s].target = st.fill[s] * PARTIAL;
+      }
+      fills[s].style.width = (st.fill[s] * 100).toFixed(1) + '%';
+      spring(st.push[s], st.push[s].target, 120, 9, dt);
+      const armTarget = st.phase === 'armed' && st.holding ? st.fill[s] * 0.5 : 0;
+      spring(st.arm[s], armTarget, 160, 12, dt);
+      st.hop[s] *= Math.exp(-5 * dt);
+    }
+    if (st.phase === 'armed' && st.locked[-1] && st.locked[1]) complete();
+    if (st.phase === 'armed') {
+      const a = activeSide();
+      for (const s of sides) meters[s].classList.toggle('wait', a !== 0 && a !== s && !st.locked[s]);
+    }
+
+    spring(st.zoom, st.zoom.target, 90, 11, dt);
+    // music grows louder as you push, but stays far off and muffled
+    const prog = st.phase === 'armed' ? (st.fill[-1] + st.fill[1] + (st.locked[-1] ? 1 : 0) + (st.locked[1] ? 1 : 0)) / 4 : 1;
+    music.set(0.16 + prog * 0.26, 170 + prog * 480, 0.2);
+    const beat = music.beat(), tb = st.t * Math.PI / music.BEAT;
+    st.shake *= Math.exp(-6 * dt);
+
+    // crowd
+    for (const p of people) {
+      const P = st.push[p.side];
+      const dx = p.F * P.s;
+      const hop = reduce ? 0 : st.hop[p.side] * p.w * 16 * Math.abs(Math.sin(st.t * 19 + p.phase))
+                             + beat * (3 + 5 * p.w) * (0.6 + 0.4 * Math.sin(p.phase));   // dancing on the kick
+      const lean = p.side * (P.v * 9 * p.w + P.s * 7 * p.w) + (reduce ? 0 : Math.sin(tb + p.phase) * (1.5 + 2.5 * p.w));
+      p.el.setAttribute('transform', `translate(${dx.toFixed(2)} ${(-hop).toFixed(2)}) rotate(${lean.toFixed(2)} ${p.x} ${p.footY})`);
+    }
+    // the viewer's arms shove outward
+    for (const s of sides) {
+      const a = st.arm[s].s;
+      armEls[s].setAttribute('transform', `translate(${(s * a * 70).toFixed(2)} ${(a * 14).toFixed(2)}) rotate(${(s * a * 14).toFixed(2)} ${400 + s * 200} 500)`);
+    }
+    // camera: jolts on every shove, and lurches forward once the gap opens
+    const sh = reduce ? 0 : st.shake * 5;
+    const z = 1 + st.zoom.s * 0.08;
+    const jx = (Math.random() - 0.5) * sh, jy = (Math.random() - 0.5) * sh;
+    cam.setAttribute('transform', `translate(${(400 + jx).toFixed(2)} ${(230 + jy).toFixed(2)}) scale(${z.toFixed(4)}) translate(-400 -230)`);
+
+    requestAnimationFrame(frameStep);
+  }
+
+  function reset() {
+    clearTimeout(meterTimer);
+    st = fresh();
+    sides.forEach(s => { meters[s].classList.remove('in', 'out', 'full', 'active', 'wait'); fills[s].style.width = '0%'; });
+    meterTimer = setTimeout(showMeters, 700);
+  }
+  document.getElementById('reset').addEventListener('click', reset);
+
+  reset();
+  requestAnimationFrame(frameStep);
+})();
+</script>
+
+</body></html>
