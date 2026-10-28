@@ -1,37 +1,417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello Class</title>
-  <style>
-    html, body {
-      margin: 0;
-      min-height: 100%;
-    }
-
-    body {
-      min-height: 100vh;
-      background-color: #222;
-      background-image: url("Note_example.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-
-    h1 {
-      margin: 0;
-      padding: 2rem 1rem;
-      text-align: center;
-      font-size: clamp(2rem, 6vw, 4rem);
-      color: #fff;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Getting to the Front</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Hello class!</h1>
+
+<div class="top">
+  <button class="reset" id="reset" type="button" aria-label="Reset">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2.5 2v3.5H6"/>
+    </svg>
+  </button>
+</div>
+
+<div class="frame" id="frame" data-stage="1" aria-label="Outdoor festival scene seen from far away. Click twice to push the camera forward.">
+
+  <!-- ===================== Stage 1: Camera Push Forward (01-camera-push-forward) ===================== -->
+  <div class="stage" id="s1">
+    <!-- Each layer: r = its distance from the camera at the end position (the back of the crowd, front row = 1) -->
+    <!-- sky, sun, clouds -->
+    <svg class="layer" data-r="200" data-e="330" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="s1-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d9d9"/><stop offset="1" stop-color="#f2f2f2"/></linearGradient></defs>
+      <rect x="-2000" y="-2000" width="4800" height="2400" fill="url(#s1-sky)"/>
+      <circle cx="660" cy="80" r="38" fill="#ffffff" stroke="#c4c4c4" stroke-width="2"/>
+      <g fill="#ffffff" opacity="0.9">
+        <ellipse cx="300" cy="70" rx="50" ry="16"/><ellipse cx="330" cy="60" rx="32" ry="16"/>
+        <ellipse cx="500" cy="110" rx="40" ry="12"/><ellipse cx="520" cy="102" rx="24" ry="12"/>
+      </g>
+    </svg>
+    <!-- distant hills -->
+    <svg class="layer" data-r="15" data-e="318" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <path d="M-3000,320 L0,320 Q120,250 260,300 T520,290 T800,280 L3800,280 L3800,2000 L-3000,2000 Z" fill="#b5b5b5"/>
+      <path d="M-3000,350 L0,350 Q150,300 320,340 T640,330 T800,335 L3800,335 L3800,2000 L-3000,2000 Z" fill="#a0a0a0"/>
+    </svg>
+    <!-- ground plane -->
+    <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <rect x="-20000" y="378" width="40000" height="20000" fill="#7a7a7a"/>
+    </svg>
+    <!-- ferris wheel -->
+    <svg class="layer" data-r="2.4" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#555555" stroke-width="3" fill="none">
+        <line x1="140" y1="200" x2="95" y2="380"/><line x1="140" y1="200" x2="185" y2="380"/>
+        <circle cx="140" cy="200" r="90"/><circle cx="140" cy="200" r="70" stroke-width="1.5"/>
+        <line x1="50" y1="200" x2="230" y2="200" stroke-width="1.5"/><line x1="140" y1="110" x2="140" y2="290" stroke-width="1.5"/>
+        <line x1="76.4" y1="136.4" x2="203.6" y2="263.6" stroke-width="1.5"/><line x1="203.6" y1="136.4" x2="76.4" y2="263.6" stroke-width="1.5"/>
+      </g>
+      <circle cx="140" cy="200" r="7" fill="#444444"/>
+      <g fill="#6a6a6a">
+        <rect x="222" y="202" width="16" height="12" rx="3"/><rect x="195.6" y="265.6" width="16" height="12" rx="3"/>
+        <rect x="132" y="292" width="16" height="12" rx="3"/><rect x="68.4" y="265.6" width="16" height="12" rx="3"/>
+        <rect x="42" y="202" width="16" height="12" rx="3"/><rect x="68.4" y="138.4" width="16" height="12" rx="3"/>
+        <rect x="132" y="112" width="16" height="12" rx="3"/><rect x="195.6" y="138.4" width="16" height="12" rx="3"/>
+      </g>
+    </svg>
+    <!-- stage: the destination -->
+    <svg class="layer" data-r="2.2" data-e="292" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <rect x="330" y="200" width="220" height="100" fill="#8a8a8a"/>
+      <polygon points="310,200 570,200 550,172 330,172" fill="#3a3a3a"/>
+      <line x1="340" y1="186" x2="540" y2="186" stroke="#7a7a7a" stroke-width="1.5"/>
+      <rect x="320" y="175" width="10" height="125" fill="#3a3a3a"/><rect x="550" y="175" width="10" height="125" fill="#3a3a3a"/>
+      <rect x="315" y="300" width="250" height="40" fill="#4a4a4a"/>
+      <rect x="288" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="302" cy="265" r="7" fill="#555555"/><circle cx="302" cy="287" r="9" fill="#555555"/>
+      <rect x="564" y="250" width="28" height="50" fill="#2e2e2e"/><circle cx="578" cy="265" r="7" fill="#555555"/><circle cx="578" cy="287" r="9" fill="#555555"/>
+      <circle cx="440" cy="252" r="9" fill="#2b2b2b"/>
+      <rect x="433" y="261" width="14" height="39" rx="5" fill="#2b2b2b"/>
+      <line x1="447" y1="268" x2="462" y2="250" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="420" y1="300" x2="420" y2="258" stroke="#2b2b2b" stroke-width="2"/><circle cx="420" cy="256" r="3" fill="#2b2b2b"/>
+    </svg>
+    <!-- tents + string lights -->
+    <svg class="layer" data-r="2.1" data-e="332" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <polygon points="605,380 650,315 695,380" fill="#9a9a9a"/><polygon points="638,380 650,345 662,380" fill="#5a5a5a"/>
+      <line x1="650" y1="315" x2="650" y2="298" stroke="#444444" stroke-width="2"/><polygon points="650,298 666,303 650,308" fill="#444444"/>
+      <polygon points="680,380 732,305 784,380" fill="#bdbdbd"/><polygon points="718,380 732,340 746,380" fill="#6a6a6a"/>
+      <line x1="732" y1="305" x2="732" y2="288" stroke="#444444" stroke-width="2"/><polygon points="732,288 748,293 732,298" fill="#444444"/>
+      <path d="M590,250 Q650,285 710,262 Q760,282 800,258" fill="none" stroke="#444444" stroke-width="1.5"/>
+      <g fill="#ffffff" stroke="#555555" stroke-width="1">
+        <circle cx="610" cy="262" r="4"/><circle cx="635" cy="270" r="4"/><circle cx="660" cy="272" r="4"/><circle cx="685" cy="268" r="4"/>
+        <circle cx="730" cy="268" r="4"/><circle cx="755" cy="271" r="4"/><circle cx="780" cy="266" r="4"/>
+      </g>
+    </svg>
+    <!-- path on the ground, drawn in true perspective each frame -->
+    <svg class="overlay" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <polygon id="s1-pathBody" fill="#9c9c9c"/>
+      <polyline id="s1-pathEdgeL" fill="none" stroke="#666666" stroke-linecap="round"/>
+      <polyline id="s1-pathEdgeR" fill="none" stroke="#666666" stroke-linecap="round"/>
+      <g id="s1-pathMarks" fill="#8a8a8a"></g>
+    </svg>
+    <!-- crowd back -->
+    <svg class="layer" data-r="1.2" data-e="394" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <g fill="#555555">
+        <circle cx="75" cy="395" r="11"/><rect x="61" y="406" width="28" height="50" rx="11"/>
+        <circle cx="145" cy="393" r="11"/><rect x="131" y="404" width="28" height="50" rx="11"/>
+        <circle cx="215" cy="396" r="11"/><rect x="201" y="407" width="28" height="50" rx="11"/>
+        <circle cx="290" cy="394" r="11"/><rect x="276" y="405" width="28" height="50" rx="11"/>
+        <circle cx="365" cy="395" r="11"/><rect x="351" y="406" width="28" height="50" rx="11"/>
+        <circle cx="435" cy="393" r="11"/><rect x="421" y="404" width="28" height="50" rx="11"/>
+        <circle cx="505" cy="396" r="11"/><rect x="491" y="407" width="28" height="50" rx="11"/>
+        <circle cx="575" cy="394" r="11"/><rect x="561" y="405" width="28" height="50" rx="11"/>
+        <circle cx="645" cy="395" r="11"/><rect x="631" y="406" width="28" height="50" rx="11"/>
+        <circle cx="715" cy="393" r="11"/><rect x="701" y="404" width="28" height="50" rx="11"/>
+      </g>
+      <g stroke="#555555" stroke-width="6" stroke-linecap="round">
+        <line x1="295" y1="410" x2="305" y2="375"/><line x1="440" y1="410" x2="450" y2="372"/>
+        <line x1="430" y1="410" x2="420" y2="372"/><line x1="650" y1="410" x2="660" y2="374"/>
+      </g>
+    </svg>
+    <!-- crowd front -->
+    <svg class="layer" data-r="1" data-e="432" data-blur="1" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <g fill="#2b2b2b">
+        <circle cx="40" cy="432" r="14"/><rect x="22" y="446" width="36" height="60" rx="14"/>
+        <circle cx="110" cy="430" r="14"/><rect x="92" y="444" width="36" height="60" rx="14"/>
+        <circle cx="180" cy="433" r="14"/><rect x="162" y="447" width="36" height="60" rx="14"/>
+        <circle cx="250" cy="431" r="14"/><rect x="232" y="445" width="36" height="60" rx="14"/>
+        <circle cx="330" cy="432" r="14"/><rect x="312" y="446" width="36" height="60" rx="14"/>
+        <circle cx="400" cy="430" r="14"/><rect x="382" y="444" width="36" height="60" rx="14"/>
+        <circle cx="470" cy="433" r="14"/><rect x="452" y="447" width="36" height="60" rx="14"/>
+        <circle cx="540" cy="431" r="14"/><rect x="522" y="445" width="36" height="60" rx="14"/>
+        <circle cx="610" cy="432" r="14"/><rect x="592" y="446" width="36" height="60" rx="14"/>
+        <circle cx="680" cy="430" r="14"/><rect x="662" y="444" width="36" height="60" rx="14"/>
+        <circle cx="750" cy="433" r="14"/><rect x="732" y="447" width="36" height="60" rx="14"/>
+      </g>
+      <g stroke="#2b2b2b" stroke-width="8" stroke-linecap="round">
+        <line x1="120" y1="452" x2="135" y2="405"/><line x1="100" y1="452" x2="85" y2="405"/>
+        <line x1="340" y1="454" x2="352" y2="408"/><line x1="480" y1="455" x2="494" y2="410"/>
+        <line x1="460" y1="455" x2="446" y2="410"/><line x1="690" y1="452" x2="702" y2="406"/>
+      </g>
+    </svg>
+
+    <!-- path-side posts nearer than the crowd -->
+    <svg class="overlay" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"><g id="s1-posts"></g></svg>
+
+    <!-- Signifiers: cursor hand + two progress circles -->
+    <div class="hint" id="s1-hint" aria-hidden="true">
+      <svg class="hand" viewBox="0 0 32 32">
+        <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <div class="dots" id="s1-dots"><span class="dot"></span><span class="dot"></span></div>
+    </div>
+  </div>
+
+  <!-- ===================== Stage 2: Push to the Side (02-push-to-the-side) ===================== -->
+  <div class="stage" id="s2" style="opacity:0;visibility:hidden">
+    <svg class="scene" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="s2-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#cfcfcf"/><stop offset="1" stop-color="#ededed"/>
+        </linearGradient>
+        <linearGradient id="s2-beam" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g id="s2-cam">
+        <rect x="-200" y="-200" width="1200" height="900" fill="url(#s2-sky)"/>
+        <!-- Stage -->
+        <rect x="270" y="150" width="260" height="110" fill="#8a8a8a"/>
+        <polygon points="250,150 550,150 528,118 272,118" fill="#3a3a3a"/>
+        <line x1="285" y1="134" x2="515" y2="134" stroke="#7a7a7a" stroke-width="1.5"/>
+        <rect x="260" y="122" width="10" height="138" fill="#3a3a3a"/>
+        <rect x="530" y="122" width="10" height="138" fill="#3a3a3a"/>
+        <polygon points="300,138 240,260 330,260" fill="url(#s2-beam)"/>
+        <polygon points="400,138 360,260 440,260" fill="url(#s2-beam)"/>
+        <polygon points="500,138 470,260 560,260" fill="url(#s2-beam)"/>
+        <g fill="#ffffff" stroke="#555555" stroke-width="1">
+          <circle cx="300" cy="140" r="5"/><circle cx="400" cy="140" r="5"/><circle cx="500" cy="140" r="5"/>
+        </g>
+        <rect x="226" y="200" width="30" height="60" fill="#2e2e2e"/>
+        <circle cx="241" cy="217" r="7" fill="#555555"/><circle cx="241" cy="242" r="10" fill="#555555"/>
+        <rect x="544" y="200" width="30" height="60" fill="#2e2e2e"/>
+        <circle cx="559" cy="217" r="7" fill="#555555"/><circle cx="559" cy="242" r="10" fill="#555555"/>
+        <circle cx="400" cy="206" r="9" fill="#2b2b2b"/>
+        <rect x="393" y="215" width="14" height="40" rx="5" fill="#2b2b2b"/>
+        <line x1="407" y1="222" x2="422" y2="202" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+        <!-- Ground -->
+        <rect x="-200" y="260" width="1200" height="440" fill="#7a7a7a"/>
+        <!-- Crowd is built in script so each person can be shoved -->
+        <g id="s2-crowd"></g>
+      </g>
+      <!-- The viewer's own arms -->
+      <g id="s2-armL">
+        <g fill="#1f1f1f">
+          <path d="M150,500 L250,500 L320,330 L285,312 Z"/>
+          <ellipse cx="305" cy="312" rx="24" ry="28" transform="rotate(25 305 312)"/>
+          <rect x="283" y="268" width="11" height="40" rx="5.5" transform="rotate(25 288 288)"/>
+          <rect x="296" y="264" width="11" height="44" rx="5.5" transform="rotate(25 301 286)"/>
+          <rect x="309" y="268" width="11" height="40" rx="5.5" transform="rotate(25 314 288)"/>
+          <rect x="321" y="276" width="10" height="34" rx="5" transform="rotate(25 326 293)"/>
+          <rect x="318" y="306" width="10" height="28" rx="5" transform="rotate(70 323 320)"/>
+        </g>
+        <path d="M165,500 L245,500 L262,455 L196,438 Z" fill="#4a4a4a"/>
+      </g>
+      <g id="s2-armR">
+        <g fill="#1f1f1f">
+          <path d="M650,500 L550,500 L480,330 L515,312 Z"/>
+          <ellipse cx="495" cy="312" rx="24" ry="28" transform="rotate(-25 495 312)"/>
+          <rect x="506" y="268" width="11" height="40" rx="5.5" transform="rotate(-25 512 288)"/>
+          <rect x="493" y="264" width="11" height="44" rx="5.5" transform="rotate(-25 499 286)"/>
+          <rect x="480" y="268" width="11" height="40" rx="5.5" transform="rotate(-25 486 288)"/>
+          <rect x="469" y="276" width="10" height="34" rx="5" transform="rotate(-25 474 293)"/>
+          <rect x="472" y="306" width="10" height="28" rx="5" transform="rotate(-70 477 320)"/>
+        </g>
+        <path d="M635,500 L555,500 L538,455 L604,438 Z" fill="#4a4a4a"/>
+      </g>
+    </svg>
+
+    <div class="meter left" id="s2-meterL" aria-hidden="true">
+      <svg class="hand" viewBox="0 0 32 32">
+        <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <div class="bar"><div class="fill" id="s2-fillL"></div><div class="ticks"></div></div>
+    </div>
+    <div class="meter right" id="s2-meterR" aria-hidden="true">
+      <svg class="hand" viewBox="0 0 32 32">
+        <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="var(--pill)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <div class="bar"><div class="fill" id="s2-fillR"></div><div class="ticks"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== Stage 3: Push Forward (03-push-forward-through-crowd) ===================== -->
+  <div class="stage" id="s3" style="opacity:0;visibility:hidden">
+    <svg class="scene" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="s3-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#cfcfcf"/><stop offset="1" stop-color="#ededed"/>
+        </linearGradient>
+        <linearGradient id="s3-beam" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.7"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g id="s3-world">
+        <rect x="-4000" y="-4000" width="8800" height="8800" fill="url(#s3-sky)"/>
+
+        <!-- Stage (r 3.0) -->
+        <g class="layer" data-r="3" data-k="3">
+          <rect x="120" y="90" width="560" height="200" fill="#8a8a8a"/>
+          <polygon points="80,90 720,90 690,48 110,48" fill="#3a3a3a"/>
+          <line x1="130" y1="70" x2="670" y2="70" stroke="#6a6a6a" stroke-width="2"/>
+          <rect x="104" y="56" width="16" height="234" fill="#3a3a3a"/>
+          <rect x="680" y="56" width="16" height="234" fill="#3a3a3a"/>
+          <g id="s3-beams">
+            <polygon points="230,80 150,290 290,290" fill="url(#s3-beam)"/>
+            <polygon points="400,80 330,290 470,290" fill="url(#s3-beam)"/>
+            <polygon points="570,80 510,290 650,290" fill="url(#s3-beam)"/>
+          </g>
+          <g fill="#ffffff" stroke="#555555" stroke-width="1.5">
+            <circle cx="230" cy="82" r="7"/><circle cx="400" cy="82" r="7"/><circle cx="570" cy="82" r="7"/>
+          </g>
+          <rect x="134" y="180" width="54" height="110" fill="#2e2e2e"/>
+          <circle class="cone" data-r0="13" cx="161" cy="210" r="13" fill="#555555"/>
+          <circle class="cone" data-r0="19" cx="161" cy="256" r="19" fill="#555555"/>
+          <rect x="612" y="180" width="54" height="110" fill="#2e2e2e"/>
+          <circle class="cone" data-r0="13" cx="639" cy="210" r="13" fill="#555555"/>
+          <circle class="cone" data-r0="19" cx="639" cy="256" r="19" fill="#555555"/>
+          <!-- Performer -->
+          <g id="s3-performer">
+            <line x1="372" y1="290" x2="372" y2="178" stroke="#2b2b2b" stroke-width="3"/>
+            <line x1="372" y1="178" x2="388" y2="172" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
+            <g id="s3-pBody">
+              <circle cx="400" cy="160" r="17" fill="#2b2b2b"/>
+              <path id="s3-smile" d="M391,163 Q400,172 409,163" fill="none" stroke="#bdbdbd" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
+              <rect x="386" y="178" width="28" height="70" rx="10" fill="#2b2b2b"/>
+              <line id="s3-armUp" x1="412" y1="190" x2="440" y2="150" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+              <!-- thumbs up, toward the viewer -->
+              <g id="s3-thumb" opacity="0">
+                <line x1="412" y1="190" x2="444" y2="176" stroke="#2b2b2b" stroke-width="7" stroke-linecap="round"/>
+                <rect x="440" y="168" width="15" height="15" rx="5" fill="#2b2b2b"/>
+                <rect x="443" y="154" width="7" height="17" rx="3.5" fill="#2b2b2b"/>
+              </g>
+              <ellipse cx="404" cy="226" rx="20" ry="14" fill="#555555" transform="rotate(-25 404 226)"/>
+              <line x1="414" y1="220" x2="452" y2="196" stroke="#555555" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <rect x="388" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+            <rect x="402" y="242" width="10" height="48" rx="4" fill="#2b2b2b"/>
+          </g>
+          <rect x="96" y="320" width="608" height="140" fill="#3a3a3a"/>
+          <rect x="96" y="290" width="608" height="34" fill="#4a4a4a"/>
+          <line x1="96" y1="290" x2="704" y2="290" stroke="#3a3a3a" stroke-width="3"/>
+        </g>
+
+        <!-- Ground + barrier (r 1.6) -->
+        <g class="layer" data-r="1.6" data-k="1.6">
+          <rect x="-4000" y="340" width="8800" height="5000" fill="#7a7a7a"/>
+          <rect x="-4000" y="324" width="8800" height="16" fill="#9a9a9a"/>
+          <g stroke="#8a8a8a" stroke-width="3">
+            <line x1="-200" y1="324" x2="-200" y2="340"/><line x1="-80" y1="324" x2="-80" y2="340"/>
+            <line x1="40" y1="324" x2="40" y2="340"/><line x1="160" y1="324" x2="160" y2="340"/>
+            <line x1="280" y1="324" x2="280" y2="340"/><line x1="400" y1="324" x2="400" y2="340"/>
+            <line x1="520" y1="324" x2="520" y2="340"/><line x1="640" y1="324" x2="640" y2="340"/>
+            <line x1="760" y1="324" x2="760" y2="340"/><line x1="880" y1="324" x2="880" y2="340"/>
+            <line x1="1000" y1="324" x2="1000" y2="340"/>
+          </g>
+        </g>
+
+        <!-- Front row at the barrier (r 1.5) -->
+        <g class="layer crowd" data-r="1.5" data-k="1.5">
+          <g fill="#8c8c8c">
+            <circle cx="30" cy="322" r="13"/><rect x="12" y="335" width="36" height="60" rx="13"/>
+            <circle cx="110" cy="320" r="13"/><rect x="92" y="333" width="36" height="60" rx="13"/>
+            <circle cx="190" cy="323" r="13"/><rect x="172" y="336" width="36" height="60" rx="13"/>
+            <circle cx="270" cy="321" r="13"/><rect x="252" y="334" width="36" height="60" rx="13"/>
+            <circle cx="350" cy="322" r="13"/><rect x="332" y="335" width="36" height="60" rx="13"/>
+            <circle cx="450" cy="320" r="13"/><rect x="432" y="333" width="36" height="60" rx="13"/>
+            <circle cx="530" cy="323" r="13"/><rect x="512" y="336" width="36" height="60" rx="13"/>
+            <circle cx="610" cy="321" r="13"/><rect x="592" y="334" width="36" height="60" rx="13"/>
+            <circle cx="690" cy="322" r="13"/><rect x="672" y="335" width="36" height="60" rx="13"/>
+            <circle cx="770" cy="320" r="13"/><rect x="752" y="333" width="36" height="60" rx="13"/>
+          </g>
+          <g stroke="#8c8c8c" stroke-width="7" stroke-linecap="round">
+            <line x1="120" y1="342" x2="132" y2="290"/><line x1="100" y1="342" x2="88" y2="290"/>
+            <line x1="280" y1="342" x2="292" y2="292"/>
+            <line x1="460" y1="342" x2="472" y2="290"/><line x1="440" y1="342" x2="428" y2="290"/>
+            <line x1="700" y1="342" x2="712" y2="292"/>
+          </g>
+        </g>
+
+        <!-- Middle row (r 1.0) -->
+        <g class="layer crowd" data-r="1" data-k="1">
+          <g fill="#5e5e5e">
+            <circle cx="70" cy="362" r="19"/><rect x="44" y="381" width="52" height="120" rx="19"/>
+            <circle cx="200" cy="358" r="19"/><rect x="174" y="377" width="52" height="120" rx="19"/>
+            <circle cx="600" cy="358" r="19"/><rect x="574" y="377" width="52" height="120" rx="19"/>
+            <circle cx="730" cy="362" r="19"/><rect x="704" y="381" width="52" height="120" rx="19"/>
+          </g>
+          <g stroke="#5e5e5e" stroke-width="10" stroke-linecap="round">
+            <line x1="215" y1="390" x2="238" y2="320"/>
+            <line x1="585" y1="390" x2="562" y2="320"/>
+            <line x1="745" y1="394" x2="768" y2="324"/>
+          </g>
+        </g>
+
+        <!-- Nearest heads (r 0.6) -->
+        <g class="layer crowd" data-r="0.6" data-k="0.6">
+          <g fill="#3a3a3a">
+            <circle cx="-4" cy="420" r="38"/><rect x="-52" y="456" width="96" height="80" rx="38"/>
+            <circle cx="804" cy="420" r="38"/><rect x="756" y="456" width="96" height="80" rx="38"/>
+          </g>
+        </g>
+
+        <!-- Two rows that stand between the viewer and the barrier at the start,
+             built from the same crowd figures, leaving a man-sized gap in the middle -->
+        <g class="layer crowd" data-r="-0.6" data-k="1.6">
+          <g fill="#4a4a4a">
+            <circle cx="60" cy="312" r="28"/><rect x="24" y="340" width="72" height="200" rx="28"/>
+            <circle cx="166" cy="318" r="28"/><rect x="130" y="346" width="72" height="200" rx="28"/>
+            <circle cx="272" cy="314" r="28"/><rect x="236" y="342" width="72" height="200" rx="28"/>
+            <circle cx="528" cy="314" r="28"/><rect x="492" y="342" width="72" height="200" rx="28"/>
+            <circle cx="634" cy="318" r="28"/><rect x="598" y="346" width="72" height="200" rx="28"/>
+            <circle cx="740" cy="312" r="28"/><rect x="704" y="340" width="72" height="200" rx="28"/>
+          </g>
+          <g stroke="#4a4a4a" stroke-width="14" stroke-linecap="round">
+            <line x1="190" y1="370" x2="214" y2="276"/><line x1="610" y1="370" x2="586" y2="276"/>
+          </g>
+        </g>
+        <g class="layer crowd" data-r="-1.4" data-k="0.8">
+          <g fill="#2e2e2e">
+            <circle cx="30" cy="300" r="46"/><rect x="-30" y="346" width="120" height="280" rx="46"/>
+            <circle cx="150" cy="306" r="46"/><rect x="90" y="352" width="120" height="280" rx="46"/>
+            <circle cx="262" cy="320" r="46"/><rect x="202" y="366" width="120" height="280" rx="46"/>
+            <circle cx="538" cy="320" r="46"/><rect x="478" y="366" width="120" height="280" rx="46"/>
+            <circle cx="650" cy="306" r="46"/><rect x="590" y="352" width="120" height="280" rx="46"/>
+            <circle cx="770" cy="300" r="46"/><rect x="710" y="346" width="120" height="280" rx="46"/>
+          </g>
+          <g stroke="#2e2e2e" stroke-width="22" stroke-linecap="round">
+            <line x1="128" y1="390" x2="96" y2="236"/><line x1="680" y1="388" x2="712" y2="240"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- The viewer's own hands -->
+      <g id="s3-handL">
+        <g fill="#1f1f1f">
+          <path d="M190,500 L280,500 L340,372 L306,356 Z"/>
+          <ellipse cx="324" cy="352" rx="23" ry="27" transform="rotate(22 324 352)"/>
+          <rect x="303" y="308" width="11" height="40" rx="5.5" transform="rotate(22 308 328)"/>
+          <rect x="316" y="304" width="11" height="44" rx="5.5" transform="rotate(22 321 326)"/>
+          <rect x="329" y="308" width="11" height="40" rx="5.5" transform="rotate(22 334 328)"/>
+          <rect x="341" y="316" width="10" height="34" rx="5" transform="rotate(22 346 333)"/>
+          <rect x="337" y="346" width="10" height="28" rx="5" transform="rotate(68 342 360)"/>
+        </g>
+        <path d="M200,500 L274,500 L290,462 L228,446 Z" fill="#4a4a4a"/>
+      </g>
+      <g id="s3-handR">
+        <g fill="#1f1f1f">
+          <path d="M610,500 L520,500 L460,372 L494,356 Z"/>
+          <ellipse cx="476" cy="352" rx="23" ry="27" transform="rotate(-22 476 352)"/>
+          <rect x="486" y="308" width="11" height="40" rx="5.5" transform="rotate(-22 492 328)"/>
+          <rect x="473" y="304" width="11" height="44" rx="5.5" transform="rotate(-22 479 326)"/>
+          <rect x="460" y="308" width="11" height="40" rx="5.5" transform="rotate(-22 466 328)"/>
+          <rect x="449" y="316" width="10" height="34" rx="5" transform="rotate(-22 454 333)"/>
+          <rect x="453" y="346" width="10" height="28" rx="5" transform="rotate(-68 458 360)"/>
+        </g>
+        <path d="M600,500 L526,500 L510,462 L572,446 Z" fill="#4a4a4a"/>
+      </g>
+    </svg>
+
+    <div class="hint" id="s3-hint" aria-hidden="true">
+      <div class="trail"></div>
+      <svg class="hand" viewBox="0 0 32 32">
+        <path d="M12 4.5c0-1.4 1-2.5 2.3-2.5S16.6 3.1 16.6 4.5V13l.2-.1c.4-1.1 1.4-1.8 2.5-1.6 1 .2 1.7 1 1.8 2l.1.2c.5-.8 1.5-1.2 2.4-1 1 .3 1.6 1.2 1.6 2.2v.3c.5-.4 1.2-.6 1.9-.4 1 .3 1.6 1.2 1.6 2.2v5.7c0 4.6-3.6 8.5-8.2 8.5h-2.4c-2.6 0-5-1.3-6.4-3.5l-4.7-7.1c-.6-1-.4-2.2.5-2.9.9-.7 2.2-.6 3 .3L12 19.3V4.5z" fill="#ffffff" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/stage1-camera.js"></script>
+<script src="js/stage2-sides.js"></script>
+<script src="js/stage3-forward.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

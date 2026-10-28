@@ -1,0 +1,175 @@
+/* Base: the page skeleton the three studies were published in */
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+
+/* Layout: one letterboxed scene frame centered on a quiet page; a reset icon sits above its top-right corner.
+   The three stages are stacked inside the frame and crossfade into each other. */
+:root {
+  --page: #e6e6e4;
+  --ink: #2b2b2b;
+  --muted: #6e6e6c;
+  --frame-edge: #c9c9c6;
+  --pill: rgba(255,255,255,0.84);
+  --pill-edge: rgba(43,43,43,0.18);
+  --bar-fill: #2b2b2b;
+  --yellow: #f6c90e;
+  --yellow-deep: #d9a900;
+  --font-ui: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+    --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); --bar-fill: #e8e8e6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #141414; --ink: #e8e8e6; --muted: #9a9a98; --frame-edge: #2c2c2c;
+  --pill: rgba(20,20,20,0.74); --pill-edge: rgba(255,255,255,0.16); --bar-fill: #e8e8e6; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--ink); font-family: var(--font-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overflow: hidden;
+}
+.top { width: min(100%, calc((100vh - 104px) * 1.6)); display: flex; justify-content: flex-end; }
+.reset {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--pill-edge); background: var(--pill); color: var(--ink); cursor: pointer;
+}
+.reset:hover { background: var(--page); }
+.reset:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reset svg { width: 16px; height: 16px; }
+.frame {
+  position: relative; width: min(100%, calc((100vh - 104px) * 1.6));
+  aspect-ratio: 8 / 5; max-width: 100%;
+  overflow: hidden; border-radius: 6px; outline: 1px solid var(--frame-edge);
+  background: #f2f2f2; cursor: default; touch-action: none; contain: paint;
+}
+.frame[data-stage="2"], .frame[data-stage="3"] { cursor: grab; }
+.frame.holding { cursor: grabbing; }
+.stage { position: absolute; inset: 0; overflow: hidden; }
+#s1 { background: #f2f2f2; }
+#s2 { background: #dedede; }
+#s3 { background: #e4e4e4; }
+
+/* ---------- Stage 1: Camera Push Forward ---------- */
+/* Vanishing point sits on the stage floor: 440,300 in the 800×500 scene */
+#s1 .layer {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  will-change: transform, filter; overflow: visible;
+}
+#s1 .overlay { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+#s1 .hint {
+  position: absolute; left: 50%; bottom: 6%;
+  transform: translate(-50%, 12px); opacity: 0;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 16px 10px 12px; border-radius: 999px;
+  background: var(--pill); border: 1px solid var(--pill-edge);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity 420ms ease, transform 520ms cubic-bezier(.2,1.4,.4,1);
+  pointer-events: none;
+}
+#s1 .hint.in { opacity: 1; transform: translate(-50%, 0); }
+#s1 .hint.out { opacity: 0; transform: translate(-50%, 8px) scale(0.92); transition-duration: 260ms; }
+#s1 .hand { width: 30px; height: 30px; color: var(--ink); animation: tap 1.3s ease-in-out infinite; transform-origin: 40% 90%; }
+@keyframes tap {
+  0%, 55%, 100% { transform: translateY(0) rotate(0); }
+  65% { transform: translateY(3px) rotate(-6deg); }
+  75% { transform: translateY(0) rotate(0); }
+  82% { transform: translateY(3px) rotate(-6deg); }
+  92% { transform: translateY(0) rotate(0); }
+}
+#s1 .dots { display: flex; gap: 8px; }
+#s1 .dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--ink); box-sizing: border-box; background: transparent;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+#s1 .dot.on { background: var(--yellow); border-color: var(--yellow-deep); animation: pop 420ms cubic-bezier(.2,1.8,.4,1); }
+@keyframes pop { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+.ripple {
+  position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  border: 2px solid var(--yellow); pointer-events: none;
+  animation: ripple 520ms ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(4.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #s1 .hand { animation: none; } }
+
+/* ---------- Stage 2: Push to the Side ---------- */
+#s2 .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Push meters: hand + charge bar on each side */
+#s2 .meter {
+  position: absolute; top: 46%;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 14px;
+  background: var(--pill); border: 1px solid var(--pill-edge);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity 420ms ease, transform 520ms cubic-bezier(.2,1.4,.4,1);
+  pointer-events: none;
+}
+#s2 .meter.left { left: 3%; transform: translate(-10px, -50%); }
+#s2 .meter.right { right: 3%; transform: translate(10px, -50%); }
+#s2 .meter.in { opacity: 1; transform: translate(0, -50%); }
+#s2 .meter.out { opacity: 0; transition-duration: 260ms; }
+#s2 .meter.wait { opacity: 0.35; scale: 0.9; }
+#s2 .meter.wait .hand { animation: none; }
+#s2 .meter.full { animation: thump 380ms cubic-bezier(.2,1.8,.4,1); }
+@keyframes thump { 0% { scale: 0.9; } 100% { scale: 1; } }
+#s2 .hand { width: 30px; height: 30px; color: var(--ink); }
+#s2 .meter.left .hand { animation: swipeL 1.4s ease-in-out infinite; }
+#s2 .meter.right .hand { animation: swipeR 1.4s ease-in-out infinite; }
+@keyframes swipeL { 0%, 15% { transform: translateX(10px); opacity: 1; } 60% { transform: translateX(-10px); opacity: 1; } 80% { transform: translateX(-10px); opacity: 0.25; } 100% { transform: translateX(10px); opacity: 1; } }
+@keyframes swipeR { 0%, 15% { transform: translateX(-10px) scaleX(-1); opacity: 1; } 60% { transform: translateX(10px) scaleX(-1); opacity: 1; } 80% { transform: translateX(10px) scaleX(-1); opacity: 0.25; } 100% { transform: translateX(-10px) scaleX(-1); opacity: 1; } }
+#s2 .meter.active .hand { animation: none; opacity: 1; }
+#s2 .meter.right.active .hand { transform: scaleX(-1); }
+#s2 .bar {
+  position: relative; width: clamp(64px, 11vw, 120px); height: 12px;
+  border: 2px solid var(--ink); border-radius: 3px; box-sizing: border-box; overflow: hidden;
+}
+#s2 .bar .fill { position: absolute; top: 0; bottom: 0; width: 0%; background: var(--bar-fill); }
+#s2 .meter.left .fill { right: 0; }
+#s2 .meter.right .fill { left: 0; }
+#s2 .bar .ticks {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(12.5% - 1px), var(--pill) calc(12.5% - 1px) 12.5%);
+}
+@media (max-width: 480px) { #s2 .meter { padding: 6px 8px; gap: 5px; } #s2 .hand { width: 22px; height: 22px; } }
+@media (prefers-reduced-motion: reduce) { #s2 .meter .hand { animation: none !important; } }
+
+/* ---------- Stage 3: Push Forward ---------- */
+#s3 .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#s3 .scene g { transform-box: view-box; }
+/* Signifier: a hand swiping forward over the gap */
+#s3 .hint {
+  position: absolute; left: 50%; top: 50%; width: 64px; height: 170px;
+  transform: translate(-50%, -22%); opacity: 0;
+  transition: opacity 420ms ease; pointer-events: none;
+}
+#s3 .hint.in { opacity: 1; }
+#s3 .hint .trail {
+  position: absolute; left: 50%; top: 6px; width: 4px; height: 124px; margin-left: -2px; border-radius: 2px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.95));
+  transform-origin: 50% 100%; animation: trail 1.5s ease-in-out infinite;
+}
+#s3 .hint .hand {
+  position: absolute; left: 50%; bottom: 0; width: 38px; height: 38px; margin-left: -15px;
+  color: #2b2b2b; animation: swipeUp 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.7));
+}
+@keyframes swipeUp {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { transform: translateY(0); opacity: 1; }
+  22% { transform: translateY(4px) scale(0.92); }
+  70% { transform: translateY(-114px) scale(0.92); opacity: 1; }
+  88%, 100% { transform: translateY(-120px) scale(1); opacity: 0; }
+}
+@keyframes trail {
+  0%, 22% { transform: scaleY(0); opacity: 0; }
+  70% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { #s3 .hint .hand, #s3 .hint .trail { animation-duration: 3s; } }
