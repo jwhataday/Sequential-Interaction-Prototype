@@ -13,6 +13,7 @@ Every time a change is applied to the live site (the prototype at the repository
 - `hello-class.html`: the earlier page, kept unchanged.
 
 ## Appearance panel
-- `js/panel.js` is the floating control panel. Keep it for later adjustments.
+- `js/panel.js` is the floating control panel (Overall tab: palette, lighting and atmosphere,
+  page and frame; Step 1-3 tabs: every element). Keep it for later adjustments.
 - `js/appearance-defaults.js` holds the saved defaults. When given a "Copy settings" list, set each
   component's values there (by its `[name]`), commit, push to `main` and republish the artifact.

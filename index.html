@@ -23,6 +23,8 @@
 
   <!-- ===================== Stage 1: Camera Push Forward (01-camera-push-forward) ===================== -->
   <div class="stage" id="s1">
+    <!-- the scene art, so lighting can be applied to it without touching the hint -->
+    <div class="art">
     <!-- Each layer: r = its distance from the camera at the end position (the back of the crowd, front row = 1) -->
     <!-- sky, sun, clouds -->
     <svg class="layer" data-r="200" data-e="330" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
@@ -136,6 +138,10 @@
     <!-- path-side posts nearer than the crowd -->
     <svg class="overlay" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"><g id="s1-posts"></g></svg>
 
+    </div>
+    <!-- lighting and atmosphere overlays, set from the panel -->
+    <div class="atmos" aria-hidden="true"><div class="haze"></div><div class="tint"></div><div class="vignette"></div></div>
+
     <!-- Signifiers: cursor hand + two progress circles -->
     <div class="hint" id="s1-hint" aria-hidden="true">
       <svg class="hand" viewBox="0 0 32 32">
@@ -208,6 +214,7 @@
         <path data-c="s2-sleeves" d="M635,500 L555,500 L538,455 L604,438 Z" fill="#4a4a4a"/>
       </g>
     </svg>
+    <div class="atmos" aria-hidden="true"><div class="haze"></div><div class="tint"></div><div class="vignette"></div></div>
 
     <div class="meter left" id="s2-meterL" aria-hidden="true">
       <svg class="hand" viewBox="0 0 32 32">
@@ -399,6 +406,7 @@
         <path data-c="s3-sleeves" d="M600,500 L526,500 L510,462 L572,446 Z" fill="#4a4a4a"/>
       </g>
     </svg>
+    <div class="atmos" aria-hidden="true"><div class="haze"></div><div class="tint"></div><div class="vignette"></div></div>
 
     <div class="hint" id="s3-hint" aria-hidden="true">
       <div class="trail"></div>

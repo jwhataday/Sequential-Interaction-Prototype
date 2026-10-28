@@ -91,6 +91,28 @@
   }
   document.getElementById('reset').addEventListener('click', reset);
 
+  // The appearance panel's "Show this step": jump straight to a step's opening view, skipping
+  // the gestures before it, so its elements can be styled while they are on screen.
+  function jump(n) {
+    if (busy || S1.busy() || n === stage) return false;
+    if (n === 1) { reset(); return true; }
+    music.start();
+    S2.stop(); S3.stop();
+    S1.setCamera(S1.TRAVEL + 0.2); show(1, 0);
+    if (n === 2) {
+      music.setFloor(0.42, 260);
+      S2.prepare(); S2.setIntro(1); show(2, 1); show(3, 0);
+      setStage(2); S2.arm();
+    } else {
+      music.setFloor(0.42, 650);
+      show(2, 0);
+      S3.prepare(); S3.setIntro(0); show(3, 1);
+      setStage(3); S3.arm();
+    }
+    return true;
+  }
+  Seq.sequence = { jump, current: () => stage };
+
   // Any click counts in stage 1: left, right, middle, or a tap. The first press anywhere
   // also starts the (still silent) music engine, as browsers require.
   document.addEventListener('contextmenu', e => e.preventDefault());

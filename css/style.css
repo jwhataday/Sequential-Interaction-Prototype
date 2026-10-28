@@ -173,3 +173,16 @@ body {
   100% { transform: scaleY(1); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { #s3 .hint .hand, #s3 .hint .trail { animation-duration: 3s; } }
+
+/* ---------- Lighting and atmosphere (set from the appearance panel; invisible by default) ---------- */
+#s1 .art { position: absolute; inset: 0; }
+.atmos, .atmos > div { position: absolute; inset: 0; pointer-events: none; }
+.atmos > div { opacity: 0; }
+#s1 .atmos { --horizon: 54%; }
+#s2 .atmos { --horizon: 52%; }
+#s3 .atmos { --horizon: 60%; }
+.atmos .haze {
+  background: linear-gradient(to bottom, transparent calc(var(--horizon) - 34%), var(--haze, #ffffff) var(--horizon), transparent calc(var(--horizon) + 22%));
+}
+.atmos .tint { mix-blend-mode: soft-light; }
+.atmos .vignette { background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,0.75) 100%); }

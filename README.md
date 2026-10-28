@@ -20,12 +20,17 @@ A festival-goer starts far from the stage and works their way to the barrier. Th
 
 ### Appearance panel
 
-A floating, collapsible panel on the left lets you restyle every element of each step: fill color, texture, opacity, stroke width, corner radius, and shadow, plus an SVG asset for each hint hand icon (built-in icons or your own uploaded `.svg`). A yellow dot marks components changed from the saved defaults.
+A floating, collapsible panel on the left restyles the whole experience, with every change previewed live.
 
+- **Overall tab**
+  - **Palette:** 11 colors (sky, hills, ground, stage, performer, crowd, fairground, lights, viewer's arms, signifier pills, signifier accent). Each one recolors a family of elements in all three steps, keeping their shades apart.
+  - **Lighting and atmosphere:** brightness, contrast and saturation (%), warmth (−100 cool to +100 warm), horizon haze (%) and haze color, light-beam strength (%) and vignette (%).
+  - **Page and frame:** page background, scene frame and reset button.
+- **Step 1–3 tabs:** every element of that step, with fill color, texture, opacity (%), stroke width (px), corner radius (px) and shadow (px), plus an SVG asset for the hint hand icons (built-in icons or your own uploaded `.svg`). **Show this step** jumps the prototype to that step so you can see what you are changing.
+- Type exact values in the number and hex boxes, or drag the sliders. Use **Find a component** to filter the open tab, and **Reset** to return one component or group to its default. Yellow dots mark what differs from the saved defaults.
 - **Restore defaults** returns everything to the saved values in `js/appearance-defaults.js`.
 - **Copy settings** copies every component's name and current values, with an instruction to save them as the new defaults.
 - Your current tweaks are remembered in this browser until you restore the defaults.
-- A step's elements are only visible while that step is on screen, so play through to a step to see its changes.
 
 ### Run it
 
